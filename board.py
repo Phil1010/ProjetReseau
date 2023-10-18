@@ -1,25 +1,77 @@
 import ship
+import player
+
 
 class Board:
     def __init__(self):
-        self.grid = [[' ' for _ in range(10)] for _ in range(10)]
-        self.ship_little = []
+        # Crée un plateau de 10x10
+        self.grid = [[" " for _ in range(10)] for _ in range(10)]
+        self.ships = []
+        self.hit_shots = []
+        self.missed_shots = []
 
-    def is_ship_sunk(self, ship):
-        # Vérifie si un bateau est coulé
-        pass
+    def add_ship(self, ship):
+        # Ajoute un bateau au plateau
+        self.ships.append(ship)
 
-    def display(self):
+    def state_board(self):
+        # Renvoie l'état du plateau
+        return self.grid
+
+    # display pour afficher le plateau de départ, sans tirs
+    def display_init(self):
         # Affiche le plateau de jeu en ligne de commande
-        print("  A B C D E F G H I J")
-        for y in range(10):
-            for x in range(10):
-                for ship in self.ship_little:
-                    if ship.x == x and ship.y == y:
-                        for i in range(ship.size):
-                            self.grid[y][x+i] = '*'
-                    else:
-                        self.grid[x][y] = ' '
-            row = ' '.join(self.grid[y])                 
-            print(f"{y} {row}")
-                
+        print("  0 1 2 3 4 5 6 7 8 9")
+        for i in range(10):
+            print(i, end=" ")
+            for j in range(10):
+                for ship in self.ships:
+                    if ship.x == j and ship.y == i:
+                        ship.display(self.grid)
+                print(self.grid[i][j], end=" ")
+            print()
+
+    def display_board(self):
+        # Crée une copie du plateau actuel pour afficher les tirs réussis et ratés
+        display_grid = [row[:] for row in self.grid]
+
+        # Marquer les tirs réussis avec "X"
+        for x, y in self.hit_shots:
+            display_grid[y][x] = "X"
+
+        # Marquer les tirs ratés avec "-"
+        for x, y in self.missed_shots:
+            display_grid[y][x] = "-"
+
+        # Affiche le plateau de jeu en ligne de commande
+        print("  0 1 2 3 4 5 6 7 8 9")
+        for i in range(10):
+            print(i, end=" ")
+            for j in range(10):
+                for ship in self.ships:
+                    if ship.x == j and ship.y == i:
+                        ship.display(self.grid)
+                print(display_grid[i][j], end=" ")
+            print()
+
+    def shot(self, x, y):
+        ships_location = []
+        for ship in self.ships:
+            ships_location.extend(
+                ship.get_coord_all()
+            )  # Utilisez extend pour ajouter les coordonnées de chaque bateau à la liste
+
+        # Vérifiez si (x, y) est dans les coordonnées des bateaux
+        if (x, y) in ships_location:
+            self.hit_shots.append((x, y))
+        else:
+            self.missed_shots.append((x, y))
+
+    def get_board(self):
+        return self.grid
+
+    def get_hit_shots(self):
+        return self.hit_shots
+
+    def get_missed_shots(self):
+        return self.missed_shots
