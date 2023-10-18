@@ -1,12 +1,23 @@
 import socket
+import board
+import json
+import ship
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind((socket.gethostname(), 8080))
-s.listen(5)
+board = board.Board()
+j = json.dumps(board.grid)
+d = j.encode()
 
-while True:
-    (clientsocket, address) = s.accept()
-    data = clientsocket.recv(256)
-    print("connexion")
-    print(data)
-    clientsocket.send(bytes("hello client", "utf-8"))
+server_socket = socket.socket()
+server_socket.bind(('0.0.0.0', 5050))
+server_socket.listen(1)
+(client_socket, client_address) = server_socket.accept()
+
+ships_json = client_socket.recv(1024)
+ships=json.loads(ships_json.decode())
+board.ships = ships
+
+print(board.ships)
+
+client_socket.send(d)
+client_socket.close()
+server_socket.close()
