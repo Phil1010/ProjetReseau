@@ -2,10 +2,11 @@ import json
 
 
 class Ship:
-    def __init__(self, x, y, size):
+    def __init__(self, x, y, size, orientation):
         self.x = x
         self.y = y
         self.size = size
+        self.orientation = orientation
 
     def is_sunk(self, grid):
         for i in range(self.size):
@@ -14,13 +15,21 @@ class Ship:
         return True
 
     def display(self, grid):
-        for i in range(self.size):
-            grid[self.y][self.x + i] = "*"
+        if self.orientation == "vertical":
+            for i in range(self.size):
+                grid[self.y + i][self.x] = "*"
+        else:
+            for i in range(self.size):
+                grid[self.y][self.x + i] = "*"
 
     def get_coord_all(self):
         coord = []
-        for i in range(self.size):
-            coord.append((self.x + i, self.y))
+        if self.orientation == "vertical":
+            for i in range(self.size):
+                coord.append((self.x, self.y + i))
+        else:
+            for i in range(self.size):
+                coord.append((self.x + i, self.y))
         return coord
 
 

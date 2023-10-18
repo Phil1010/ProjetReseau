@@ -3,17 +3,15 @@ import ship
 import player
 
 player1 = player.Player("Player1", board.Board())
-player1.board.add_ship(ship.Ship(0, 0, 2))
-player1.board.add_ship(ship.Ship(4, 5, 4))
+player1.board.display_init()
 
-player2 = player.Player("Player2", board.Board())
-player2.board.add_ship(ship.Ship(1, 1, 2))
-player2.board.add_ship(ship.Ship(6, 4, 3))
+player1.board.add_ship(ship.Ship(0, 0, 2, "horizontal"))
+player1.board.add_ship(ship.Ship(4, 5, 4, "vertical"))
+
+player1.board.display_ships()
 
 print("Le plateau du premier joueur : " + player1.name)
-player1.board.display_init()
-print("Le plateau du deuxième joueur : " + player2.name)
-player2.board.display_init()
+
 
 x = int(input("Entrez la coordonnée X du tir : "))
 y = int(input("Entrez la coordonnée Y du tir : "))

@@ -11,15 +11,35 @@ class Board:
         self.missed_shots = []
 
     def add_ship(self, ship):
+        # test si le bateau rentre dans le plateau et si il n'y a pas de bateau déjà présent
+        if ship.orientation == "vertical":
+            if ship.y + ship.size > 10:
+                raise Exception("Le bateau ne rentre pas dans le plateau")
+            for i in range(ship.size):
+                if self.grid[ship.y + i][ship.x] != " ":
+                    raise Exception("Il y a déjà un bateau à cet endroit")
+                self.grid[ship.y + i][ship.x] = "*"
+        else:
+            if ship.x + ship.size > 10:
+                raise Exception("Le bateau ne rentre pas dans le plateau")
+            for i in range(ship.size):
+                if self.grid[ship.y][ship.x + i] != " ":
+                    raise Exception("Il y a déjà un bateau à cet endroit")
+                self.grid[ship.y][ship.x + i] = "*"
         # Ajoute un bateau au plateau
         self.ships.append(ship)
 
-    def state_board(self):
-        # Renvoie l'état du plateau
-        return self.grid
+    # affiche juste le plateau, sans batteaux
+    def display_init(self):
+        print("  0 1 2 3 4 5 6 7 8 9")
+        for i in range(10):
+            print(i, end=" ")
+            for j in range(10):
+                print(self.grid[i][j], end=" ")
+            print()
 
     # display pour afficher le plateau de départ, sans tirs
-    def display_init(self):
+    def display_ships(self):
         # Affiche le plateau de jeu en ligne de commande
         print("  0 1 2 3 4 5 6 7 8 9")
         for i in range(10):

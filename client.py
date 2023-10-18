@@ -1,21 +1,35 @@
 import socket
 import json
-import board
-import ship
 
-b = board.Board()
+# Paramètres du client
+host = "127.0.0.1"  # Adresse IP du serveur
+port = 12345  # Port du serveur
 
-my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-my_socket.connect(('127.0.0.1', 5050))
-shipX = input("Placer petit bateau x: ")
-shipY = input("Placer petit bateau y: ")
-my_socket.send(ship.ShipEncoder().encode(ship.Ship(shipX, shipY, 2)).encode())
-data = my_socket.recv(1024)
-j = json.loads(data.decode())
+# Création d'une socket client
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-b.grid = j
-b.ship_little = [ship.Ship(shipX, shipY, 2)]
-b.display()
+# Connexion au serveur
+client_socket.connect((host, port))
 
-my_socket.close()
+# Recevoir la demande de choix du serveur
+message = client_socket.recv(1024).decode("utf-8")
+print(message)
 
+# Demander au joueur de choisir un mode
+mode_choice = input("Votre choix (PVP ou solo): ")
+
+# Envoyer la réponse au serveur
+client_socket.send(mode_choice.encode("utf-8"))
+
+# saisie du pseudo
+pseudo = input("Votre pseudo : ")
+
+# Envoyer la réponse au serveur
+client_socket.send(pseudo.encode("utf-8"))
+
+# Recevoir le plateau du joueur
+message = client_socket.recv(1024).decode("utf-8")
+print(message)
+
+# Fermer la socket client
+client_socket.close()
