@@ -31,5 +31,55 @@ client_socket.send(pseudo.encode("utf-8"))
 message = client_socket.recv(1024).decode("utf-8")
 print(message)
 
+# Demander au joueur de placer ses bateaux
+placement1 = input(
+    "Entrez les coordonnées du premier bateau x;y;longueur du bateau;son orientation(0<=x&y<=9; longueur = (2,3,4); orientation = h ou v) ex: 0;0;2;h: "
+)
+
+# Envoyer la réponse au serveur
+client_socket.send(placement1.encode("utf-8"))
+
+# Recevoir et afficher le plateau du joueur
+message = client_socket.recv(1024).decode("utf-8")
+print(message)
+
+# Demander au joueur de placer ses bateaux
+placement2 = input(
+    "Entrez les coordonnées du deuxième bateau x;y;longueur du bateau;son orientation(0<=x&y<=9; longueur = (2,3,4); orientation = h ou v) ex: 0;0;2;h: "
+)
+
+# Envoyer la réponse au serveur
+client_socket.send(placement2.encode("utf-8"))
+
+# Recevoir et afficher le plateau du joueur
+message = client_socket.recv(1024).decode("utf-8")
+print(message)
+
+# Demander au joueur de placer ses bateaux
+placement3 = input(
+    "Entrez les coordonnées du troisième bateau x;y;longueur du bateau;son orientation(0<=x&y<=9; longueur = (2,3,4); orientation = h ou v) ex: 0;0;2;h: "
+)
+
+# Envoyer la réponse au serveur
+client_socket.send(placement3.encode("utf-8"))
+
+# Recevoir et afficher le plateau du joueur
+message = client_socket.recv(1024).decode("utf-8")
+print(message)
+
+# Recevoir le plateau du bot
+message = client_socket.recv(1024).decode("utf-8")
+print("Voici le plateau de votre opposant : " + "\n" + message)
+
+# demande au joueur de tirer
+shot = input("Entrez les coordonnées du tir x;y (0<=x&y<=9): ")
+
+# Envoyer la réponse au serveur
+client_socket.send(shot.encode("utf-8"))
+
+# Recevoir le plateau du bot
+message = client_socket.recv(1024).decode("utf-8")
+print("Voici le plateau de votre opposant : " + "\n" + message)
+
 # Fermer la socket client
 client_socket.close()

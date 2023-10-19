@@ -5,24 +5,36 @@ import random
 
 
 class Bot:
-    playerBot = player.Player("Bot", board.Board())
-    random_direction = random.choice(["horizontal", "vertical"])
+    def __init__(self, board):
+        self.board = board
 
-    if random_direction == "horizontal":
+    def add_ship_bot(self):
+        random_direction = random.choice(["h", "v"])
         random_coordonnees = random.randint(0, 5)
-    if random_direction == "vertical":
-        random_coordonnees = random.randint(0, 5)
 
-    random_size = random.choice([2, 3, 4])
+        try:
+            if len(self.board.ships) == 0:
+                self.board.add_ship(
+                    ship.Ship(
+                        random_coordonnees, random_coordonnees, 2, random_direction
+                    )
+                )
+            elif len(self.board.ships) == 1:
+                self.board.add_ship(
+                    ship.Ship(
+                        random_coordonnees, random_coordonnees, 3, random_direction
+                    )
+                )
+            elif len(self.board.ships) == 2:
+                self.board.add_ship(
+                    ship.Ship(
+                        random_coordonnees, random_coordonnees, 4, random_direction
+                    )
+                )
+        except Exception:
+            self.add_ship_bot()
 
-    playerBot.board.add_ship(
-        ship.Ship(random_coordonnees, random_coordonnees, random_size, random_direction)
-    )
-
-    playerBot.board.add_ship(
-        ship.Ship(random_coordonnees, random_coordonnees, random_size, random_direction)
-    )
-
-    playerBot.board.add_ship(
-        ship.Ship(random_coordonnees, random_coordonnees, random_size, random_direction)
-    )
+    def shot(self):
+        random_x = random.randint(0, 9)
+        random_y = random.randint(0, 9)
+        self.board.shot(random_x, random_y)

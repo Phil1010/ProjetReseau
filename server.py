@@ -2,6 +2,8 @@ import socket
 import player
 import board
 import json
+import ship
+import bot
 
 # Paramètres du serveur
 host = "127.0.0.1"  # Adresse IP du serveur
@@ -38,12 +40,52 @@ elif mode_choice.lower() == "solo":
     print(f"Pseudo du joueur : {message}")
     # le serveur crée un player avec le pseudo du joueur
     player1 = player.Player(message, board.Board())
+    # le serveur envoie le plateau de départ au joueur
+    client_socket.send(player1.board.display_init().encode("utf-8"))
 
-    player1.board.display_init()
+    # le serveur recoit la liste des placements des bateaux du joueur
+    message = client_socket.recv(1024).decode("utf-8")
+    # le serveur va ajouter le bateau du joueur dans le plateau
+    x, y, size, direction = message.split(";")
+    ship1 = ship.Ship(int(x), int(y), int(size), direction)
+    player1.board.ships.append(ship1)
+    player1.board.add_ship(ship1)
+    # le serveur envoie le plateau de départ au joueur
+    client_socket.send(player1.board.display_init().encode("utf-8"))
 
-    player_board_json = json.dumps(player1.board.get_board())
-    client_socket.send(player_board_json.encode("utf-8"))
-    print(player_board_json)
+    message = client_socket.recv(1024).decode("utf-8")
+    x2, y2, size2, direction2 = message.split(";")
+    ship2 = ship.Ship(int(x2), int(y2), int(size2), direction2)
+    player1.board.ships.append(ship2)
+    player1.board.add_ship(ship2)
+    client_socket.send(player1.board.display_init().encode("utf-8"))
+
+    message = client_socket.recv(1024).decode("utf-8")
+    x3, y3, size3, direction3 = message.split(";")
+    ship3 = ship.Ship(int(x3), int(y3), int(size3), direction3)
+    player1.board.ships.append(ship3)
+    player1.board.add_ship(ship3)
+    client_socket.send(player1.board.display_init().encode("utf-8"))
+
+    # le serveur créer un bot
+    bot = bot.Bot(board.Board())
+    bot.add_ship_bot()
+    bot.add_ship_bot()
+    bot.add_ship_bot()
+    print("Voici le plateau du bot : " + "\n" + bot.board.display_ships())
+
+    # le serveur envoi le plateau sans ship du bot au joueur
+    client_socket.send(bot.board.display_board_without_ships().encode("utf-8"))
+
+    # recevoir les coordonnées du tir du joueur
+    print("Attente des coordonnées du tir du joueur...")
+    message = client_socket.recv(1024).decode("utf-8")
+    x, y = message.split(";")
+    bot.board.shot(int(x), int(y))
+
+    # envoyer le plateau du bot au joueur
+    client_socket.send(bot.board.display_board_without_ships().encode("utf-8"))
+
 
 else:
     print("Choix de mode invalide.")

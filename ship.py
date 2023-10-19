@@ -15,12 +15,20 @@ class Ship:
         return True
 
     def display(self, grid):
-        if self.orientation == "vertical":
+        if self.orientation == "v":
             for i in range(self.size):
                 grid[self.y + i][self.x] = "*"
         else:
             for i in range(self.size):
                 grid[self.y][self.x + i] = "*"
+
+    def hide(self, grid):
+        if self.orientation == "v":
+            for i in range(self.size):
+                grid[self.y + i][self.x] = " "
+        else:
+            for i in range(self.size):
+                grid[self.y][self.x + i] = " "
 
     def get_coord_all(self):
         coord = []
