@@ -23,6 +23,8 @@ client_socket.send(mode_choice.encode("utf-8"))
 
 # saisie du pseudo
 pseudo = input("Votre pseudo : ")
+while pseudo.strip() == "":
+    pseudo = input("Votre pseudo : ")
 
 # Envoyer la réponse au serveur
 client_socket.send(pseudo.encode("utf-8"))
