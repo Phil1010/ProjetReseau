@@ -17,6 +17,8 @@ print(message)
 
 # Demander au joueur de choisir un mode
 mode_choice = input("Votre choix (PVP ou solo): ")
+while not (mode_choice.lower() == "pvp" or mode_choice.lower() == "solo"):
+    mode_choice = input("Votre choix (PVP ou solo): ")
 
 # Envoyer la réponse au serveur
 client_socket.send(mode_choice.encode("utf-8"))
