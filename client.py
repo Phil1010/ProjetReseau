@@ -1,5 +1,4 @@
 import socket
-import json
 
 # Paramètres du client
 host = "127.0.0.1"  # Adresse IP du serveur
@@ -69,21 +68,35 @@ client_socket.send(placement3.encode("utf-8"))
 
 # Recevoir et afficher le plateau du joueur
 message = client_socket.recv(1024).decode("utf-8")
-print(message)
+print("Voici votre plateau :" + "\n" + message)
 
-# Recevoir le plateau du bot
-message = client_socket.recv(1024).decode("utf-8")
-print("Voici le plateau de votre opposant : " + "\n" + message)
+# tant que le serveur n'a pas dit que le joueur a gagné ou le bot n'a pas gagné on continue la partie
+while True:
+    # Recevoir le plateau du bot
+    message = client_socket.recv(1024).decode("utf-8")
+    print("Voici le plateau de votre opposant : " + "\n" + message)
 
-# demande au joueur de tirer
-shot = input("Entrez les coordonnées du tir x;y (0<=x&y<=9): ")
+    # demande au joueur de tirer
+    shot = input("Entrez les coordonnées du tir x;y (0<=x&y<=9): ")
 
-# Envoyer la réponse au serveur
-client_socket.send(shot.encode("utf-8"))
+    # Envoyer la réponse au serveur
+    client_socket.send(shot.encode("utf-8"))
 
-# Recevoir le plateau du bot
-message = client_socket.recv(1024).decode("utf-8")
-print("Voici le plateau de votre opposant : " + "\n" + message)
+    # Recevoir le plateau du bot
+    message = client_socket.recv(1024).decode("utf-8")
+    print("Voici le plateau de votre opposant : " + "\n" + message)
+
+    print("Votre ennemi a tiré !" + "\n" + "Voici votre plateau : ")
+    message = client_socket.recv(1024).decode("utf-8")
+    print(message)
+
+    if "Vous avez gagné !" in message:
+        print("Vous avez gagné !")
+        break
+    elif "Vous avez perdu !" in message:
+        print("Vous avez perdu !")
+        break
+
 
 # Fermer la socket client
 client_socket.close()

@@ -37,4 +37,4 @@ class Bot:
     def shot(self):
         random_x = random.randint(0, 9)
         random_y = random.randint(0, 9)
-        self.board.shot(random_x, random_y)
+        return random_x, random_y

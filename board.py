@@ -57,6 +57,10 @@ class Board:
         # Crée une copie du plateau actuel pour afficher les tirs réussis et ratés
         display_grid = [row[:] for row in self.grid]
 
+        # Affiche les navires sur le plateau
+        for ship in self.ships:
+            ship.display(display_grid)
+
         # Marquer les tirs réussis avec "X"
         for x, y in self.hit_shots:
             display_grid[y][x] = "X"
@@ -70,9 +74,6 @@ class Board:
         for i in range(10):
             result += f"{i} "
             for j in range(10):
-                for ship in self.ships:
-                    if ship.x == j and ship.y == i:
-                        ship.display(self.grid)
                 result += display_grid[i][j] + " "
             result += "\n"
         return result
@@ -112,8 +113,19 @@ class Board:
         # Vérifiez si (x, y) est dans les coordonnées des bateaux
         if (x, y) in ships_location:
             self.hit_shots.append((x, y))
+            self.grid[y][x] = "X"
+
         else:
             self.missed_shots.append((x, y))
+            self.grid[y][x] = "-"
+        return self.grid
+
+    def is_win(self):
+        # Vérifiez si tous les bateaux sont coulés
+        if self.display_board().count("*") == 0:
+            return True
+        else:
+            return False
 
     def get_board(self):
         return self.grid

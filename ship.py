@@ -1,6 +1,3 @@
-import json
-
-
 class Ship:
     def __init__(self, x, y, size, orientation):
         self.x = x
@@ -32,15 +29,10 @@ class Ship:
 
     def get_coord_all(self):
         coord = []
-        if self.orientation == "vertical":
+        if self.orientation == "v":
             for i in range(self.size):
                 coord.append((self.x, self.y + i))
         else:
             for i in range(self.size):
                 coord.append((self.x + i, self.y))
         return coord
-
-
-class ShipEncoder(json.JSONEncoder):
-    def default(self, obj):
-        return obj.__dict__
