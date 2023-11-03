@@ -1,3 +1,6 @@
+from json import JSONEncoder
+
+
 class Ship:
     def __init__(self, x, y, size, orientation):
         self.x = x
@@ -36,3 +39,8 @@ class Ship:
             for i in range(self.size):
                 coord.append((self.x + i, self.y))
         return coord
+
+
+class ShipEncoder(JSONEncoder):
+    def default(self, o):
+        return o.__dict__
