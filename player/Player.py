@@ -19,3 +19,11 @@ class Player(ABC):
     @abstractmethod
     def getShip(self, size: int) -> Ship:
         pass
+
+    @abstractmethod
+    def win(self) -> None:
+        pass
+
+    @abstractmethod
+    def lose(self) -> None:
+        pass

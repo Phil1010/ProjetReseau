@@ -1,0 +1,5 @@
+semaine 06/11
+
+- le joueur doit recevoir le message gagné / perdu
+- pvp
+- réparer interface client

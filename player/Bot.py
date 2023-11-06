@@ -18,3 +18,9 @@ class Bot(Player):
         randomX = random.randint(0, 10 - 1 - size)
         randomY = random.randint(0, 10 - 1 - size)
         return Ship(randomX, randomY, size, orientation)
+
+    def win(self) -> None:
+        print("bot win!")
+
+    def lose(self) -> None:
+        print("bot lose!")

@@ -41,6 +41,11 @@ bateau = Ship(bateauValues[0], bateauValues[1], 3, bateauValues[2])
 client_socket.send(ShipEncoder().encode(bateau).encode())
 
 while True:
-    print(client_socket.recv(1024).decode())  # affichage grille
+    message = client_socket.recv(2048).decode()
+    if message != "play":
+       print(message)
+       break
+    print(client_socket.recv(2048).decode())  # affichage grille
     coords = input("ou tirer ? (x, y)")
     client_socket.send(coords.encode())
+

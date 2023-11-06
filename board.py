@@ -16,13 +16,13 @@ class Board:
 | _ ) __ _| |_ __ _(_) | |___   _ _  __ ___ ____ _| |___ 
 | _ \/ _` |  _/ _` | | | / -_) | ' \/ _` \ V / _` | / -_)
 |___/\__,_|\__\__,_|_|_|_\___| |_||_\__,_|\_/\__,_|_\___|
-    \n"""
+\n"""
 
-        res += "# - - - - - - - - - - #" + 5 * " " + "# - - - - - - - - - - #\n"
-        res += "#    votre plateau    #" + 5 * " " + "#    plateau ennemi   #\n"
-        res += "# - - - - - - - - - - #" + 5 * " " + "# - - - - - - - - - - #\n\n\n"
+        res += "# - - - - - - - - - - #" + 10 * " " + "# - - - - - - - - - - #\n"
+        res += "#    votre plateau    #" + 10 * " " + "#    plateau ennemi   #\n"
+        res += "# - - - - - - - - - - #" + 10 * " " + "# - - - - - - - - - - #\n\n"
 
-        res += "# 0 1 2 3 4 5 6 7 8 9 #" + 5 * " " + "# 0 1 2 3 4 5 6 7 8 9 #\n"
+        res += "# 0 1 2 3 4 5 6 7 8 9 #" + 10 * " " + "# 0 1 2 3 4 5 6 7 8 9 #\n"
         return res
 
     def drawLineWithoutShip(self, n: int) -> str:
@@ -87,7 +87,6 @@ class Board:
             self.missed_shots.append((x, y))
             self.grid[y][x] = "-"
 
-        print(self.grid)
         return self.grid
 
     def is_win(self):

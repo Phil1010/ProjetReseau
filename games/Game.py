@@ -12,7 +12,6 @@ class Game(ABC):
         self.turn = 0
 
         self.initShips()
-        print(self.boardPlayerB.drawFullBoard())
 
     def initShips(self):
         # TODO: faire ca en plus propre
@@ -39,6 +38,7 @@ class Game(ABC):
     def nextTurn(self):
         if self.turn % 2 == 0:
             self.boardPlayerB = self.playerA.play(self.boardPlayerA, self.boardPlayerB)
+            
             print(self.boardPlayerB.drawFullBoard())
         else:
             self.boardPlayerA = self.playerB.play(self.boardPlayerB, self.boardPlayerA)
@@ -46,7 +46,21 @@ class Game(ABC):
         self.turn += 1
 
     def isFinished(self) -> bool:
-        return self.boardPlayerA.is_win() or self.boardPlayerB.is_win()
+        finished = self.boardPlayerA.is_win() or self.boardPlayerB.is_win()
+       
+        if finished:
+            if not self.boardPlayerA.is_win():
+                self.playerA.win()
+                self.playerB.lose()
+                print("a win b lose")
+            else:
+                self.playerB.win()
+                self.playerA.lose()
+                print("b win a lose")
+
+        
+
+        return finished
 
     def drawGame(self) -> str:
         return ""

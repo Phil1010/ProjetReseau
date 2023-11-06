@@ -14,14 +14,16 @@ class Human(Player):
         self.name = self.socket.recv(1024).decode("utf-8")
 
     def play(self, playerBoard: Board, ennemyBoard: Board) -> Board:
+        self.socket.send("play".encode())
+
         res = playerBoard.drawHeader()
         for i in range(10):
             res += playerBoard.drawLineWithShipsAndShots(i)
-            res += 5 * " "
+            res += 10 * " "
             res += ennemyBoard.drawLineWithShots(i)
             res += "\n"
 
-        res += "# - - - - - - - - - - #" + 5 * " " + "# - - - - - - - - - - #\n"
+        res += "# - - - - - - - - - - #" + 10 * " " + "# - - - - - - - - - - #\n"
 
         self.socket.send(res.encode())
 
@@ -40,3 +42,9 @@ class Human(Player):
             shipDict["size"],
             shipDict["orientation"],
         )
+    
+    def win(self):
+        self.socket.send("Vous avez gagné !".encode())
+
+    def lose(self):
+        self.socket.send("Vous avez perdu !".encode()) 
