@@ -13,11 +13,18 @@ class Bot(Player):
         ennemyBoard.shot(random.randint(0, 9), random.randint(0, 9))
         return ennemyBoard
 
-    def getShip(self, size: int) -> Ship:
+    def getShip(self, board: Board, size: int) -> Ship:
         orientation = random.choice(["h", "v"])
         randomX = random.randint(0, 10 - 1 - size)
         randomY = random.randint(0, 10 - 1 - size)
-        return Ship(randomX, randomY, size, orientation)
+        ship = Ship(randomX, randomY, size, orientation)
+        while not board.isShipPlacable(ship):
+            orientation = random.choice(["h", "v"])
+            randomX = random.randint(0, 10 - 1 - size)
+            randomY = random.randint(0, 10 - 1 - size)
+            ship = Ship(randomX, randomY, size, orientation)
+
+        return ship
 
     def win(self) -> None:
         print("bot win!")

@@ -112,3 +112,30 @@ class Board:
 
     def get_missed_shots(self):
         return self.missed_shots
+
+    def isShipPositionValid(self, ship: ship.Ship) -> bool:
+        if ship.x >= 0 and ship.x < 10 and ship.y >= 0 and ship.y < 10:
+            return True
+
+        return False
+
+    def isShipPlacable(self, ship: ship.Ship) -> bool:
+        if not self.isShipPositionValid(ship):
+            return False
+
+        if ship.orientation == "v":
+            for y in range(0, ship.size):
+                if self.grid[ship.y + y][ship.x] != "~":
+                    return False
+        elif ship.orientation == "h":
+            for x in range(0, ship.size):
+                if self.grid[ship.y][ship.x + x] != "~":
+                    return False
+
+        return True
+
+    def isShotPositionValid(self, x, y: int) -> bool:
+        if x >= 0 and x < 10 and y >= 0 and y < 10:
+            return True
+
+        return False

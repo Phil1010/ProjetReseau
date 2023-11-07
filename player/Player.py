@@ -17,7 +17,7 @@ class Player(ABC):
         pass
 
     @abstractmethod
-    def getShip(self, size: int) -> Ship:
+    def getShip(self, board: Board, size: int) -> Ship:
         pass
 
     @abstractmethod

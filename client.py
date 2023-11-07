@@ -21,31 +21,31 @@ client_socket.send(pseudo.encode("utf-8"))
 
 # choisir l'emplacement des bateaux
 
-bateauInput = input("ou mettre petit bateau ? (x, y, orientation)")
-bateauValues = bateauInput.split(",")
-bateau = Ship(bateauValues[0], bateauValues[1], 1, bateauValues[2])
-print(ShipEncoder().encode(bateau))
-client_socket.send(ShipEncoder().encode(bateau).encode())
-
-
-bateauInput = input("ou mettre moyen bateau")
-bateauValues = bateauInput.split(",")
-bateau = Ship(bateauValues[0], bateauValues[1], 2, bateauValues[2])
-print(ShipEncoder().encode(bateau))
-
-client_socket.send(ShipEncoder().encode(bateau).encode())
-
-bateauInput = input("ou mettre grand bateau")
-bateauValues = bateauInput.split(",")
-bateau = Ship(bateauValues[0], bateauValues[1], 3, bateauValues[2])
-client_socket.send(ShipEncoder().encode(bateau).encode())
+n = 1
 
 while True:
-    message = client_socket.recv(2048).decode()
-    if message != "play":
-       print(message)
-       break
-    print(client_socket.recv(2048).decode())  # affichage grille
-    coords = input("ou tirer ? (x, y)")
-    client_socket.send(coords.encode())
+    print("En attente de votre adversaire...")
+    messages = client_socket.recv(2048).decode()
+    for message in messages.split("\n"):
+        if message == "boat":
+            if n == 1:
+                print("Placement du petit bateau : ")
+            elif n == 2:
+                print("Placement du bateau moyen : ")
+            else:
+                print("Placement du grand bateau : ")
 
+            x = input("\tEntrez la position x de votre bateau (entre 0 et 9 inclus) : ")
+            y = input("\tEntrez la position y de votre bateau (entre 0 et 9 inclus) : ")
+            d = input("\tEntrez la direction de votre bateau (h ou v ) :  ")
+            bateau = Ship(x, y, n, d)
+            client_socket.send(ShipEncoder().encode(bateau).encode())
+
+        elif message == "play":
+            print(client_socket.recv(2048).decode())  # affichage grille
+            x = input("Entrez la position x ou vous souhaitez tirer : ")
+            y = input("Entrez la position y ou vous souhaitez tirer : ")
+            client_socket.send(f"{x}, {y}".encode())
+
+        else:
+            print(message)
