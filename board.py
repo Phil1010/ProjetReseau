@@ -114,10 +114,18 @@ class Board:
         return self.missed_shots
 
     def isShipPositionValid(self, ship: ship.Ship) -> bool:
-        if ship.x >= 0 and ship.x < 10 and ship.y >= 0 and ship.y < 10:
-            return True
+        if ship.x < 0 and ship.x > 9  and ship.y < 0 and ship.y > 9:
+            return False
 
-        return False
+        if ship.orientation == "h":
+            if ship.x + ship.size > 9:
+                return False
+            
+        elif ship.orientation == "v":
+            if ship.y + ship.size > 9:
+                return False
+
+        return True
 
     def isShipPlacable(self, ship: ship.Ship) -> bool:
         if not self.isShipPositionValid(ship):
@@ -131,6 +139,8 @@ class Board:
             for x in range(0, ship.size):
                 if self.grid[ship.y][ship.x + x] != "~":
                     return False
+        else:  # l'orientation est pas bonne
+            return False
 
         return True
 

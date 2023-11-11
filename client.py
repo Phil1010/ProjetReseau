@@ -23,23 +23,25 @@ client_socket.send(pseudo.encode("utf-8"))
 
 n = 1
 
+def placeBoat(size: int):
+    x = input(f"\tEntrez la position x de votre bateau (entre 0 et {9-size} inclus) : ")
+    y = input(f"\tEntrez la position y de votre bateau (entre 0 et {9-size} inclus) : ")
+    d = input("\tEntrez la direction de votre bateau ((h)orizontal ou (v)ertical ) :  ")
+    bateau = Ship(x, y, size, d)
+    client_socket.send(ShipEncoder().encode(bateau).encode())
+
 while True:
     print("En attente de votre adversaire...")
     messages = client_socket.recv(2048).decode()
     for message in messages.split("\n"):
-        if message == "boat":
-            if n == 1:
-                print("Placement du petit bateau : ")
-            elif n == 2:
-                print("Placement du bateau moyen : ")
-            else:
-                print("Placement du grand bateau : ")
+        if message == "small boat":
+           placeBoat(2)
 
-            x = input("\tEntrez la position x de votre bateau (entre 0 et 9 inclus) : ")
-            y = input("\tEntrez la position y de votre bateau (entre 0 et 9 inclus) : ")
-            d = input("\tEntrez la direction de votre bateau (h ou v ) :  ")
-            bateau = Ship(x, y, n, d)
-            client_socket.send(ShipEncoder().encode(bateau).encode())
+        elif message == "medium boat":
+            placeBoat(3)
+
+        elif message == "big boat":
+            placeBoat(4)
 
         elif message == "play":
             print(client_socket.recv(2048).decode())  # affichage grille
@@ -49,3 +51,5 @@ while True:
 
         else:
             print(message)
+
+    
