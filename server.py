@@ -1,8 +1,7 @@
 import socket
+import threading
 from player import Player
 from board import Board
-import json
-import ship
 from bot import Bot
 from game import Game
 
@@ -13,14 +12,34 @@ port = 12345  # Port d'écoute du serveur
 # Création d'une socket serveur
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
+def handle_client(client_socket, client_address):  # Ajoutez client_address ici
+    # Gérer le client
+    print(f"Connexion établie avec {client_address}")
 
+    # Envoyer la demande de choix au client
+    client_socket.send("Choisissez votre mode de jeu (PVP ou solo): ".encode("utf-8"))
+
+    # Recevoir la réponse du client
+    mode_choice = client_socket.recv(1024).decode("utf-8")
+
+    if mode_choice.lower() == "pvp":
+        print("Le client a choisi le mode PVP.")
+        pvp(client_socket)
+    elif mode_choice.lower() == "solo":
+        print("Le client a choisi le mode solo.")
+        solo(client_socket)
+    else:
+        print("Choix de mode invalide.")
+
+    # Fermer la connexion avec le client
+    client_socket.close()
+    
 def pvp(client_socket):
     print("Le client a choisi le mode PVP.")
     raise Exception("pvp not implemented")
 
 
 def solo(client_socket):
-    print("Le client a choisi le mode solo.")
 
     # le serveur reçoit le pseudo du joueur
     username = client_socket.recv(1024).decode("utf-8")
@@ -112,43 +131,17 @@ def run():
     server_socket.bind((host, port))
 
     # Attente de connexions
-    server_socket.listen(1)
+    server_socket.listen(5)  # Augmentez le nombre maximum de connexions en attente
 
     print("Attente de connexions...")
 
-    # Accepter la connexion d'un client
-    client_socket, client_address = server_socket.accept()
-    print(f"Connexion établie avec {client_address}")
+    while True:
+        # Accepter la connexion d'un client
+        client_socket, client_address = server_socket.accept()
 
-    # Envoyer la demande de choix au client
-    client_socket.send("Choisissez votre mode de jeu (PVP ou solo): ".encode("utf-8"))
+        # Créer un thread pour gérer le client
+        client_handler = threading.Thread(target=handle_client, args=(client_socket, client_address))
+        client_handler.start()
 
-    # Recevoir la réponse du client
-    mode_choice = client_socket.recv(1024).decode("utf-8")
-
-    if mode_choice.lower() == "pvp":
-        print("Le client a choisi le mode PVP.")
-        pvp(client_socket)
-    elif mode_choice.lower() == "solo":
-        print("Le client a choisi le mode solo.")
-        solo(client_socket)
-
-    else:
-        print("Choix de mode invalide.")
-        # Recevoir la réponse du client
-        mode_choice = client_socket.recv(1024).decode("utf-8")
-        if mode_choice.lower() == "pvp":
-            pvp(client_socket)
-
-        elif mode_choice.lower() == "solo":
-            solo(client_socket)
-
-        else:
-            print("Choix de mode invalide.")
-
-    # Fermer les sockets
-    client_socket.close()
-    server_socket.close()
-
-
-run()
+if __name__ == "__main__":
+    run()

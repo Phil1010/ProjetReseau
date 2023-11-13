@@ -91,10 +91,8 @@ while True:
     print(message)
 
     if "Vous avez gagné !" in message:
-        print("Vous avez gagné !")
         break
     elif "Vous avez perdu !" in message:
-        print("Vous avez perdu !")
         break
 
 
