@@ -1,6 +1,7 @@
 import json
 from typing import List
 from board import Board
+from chrono import Timer
 from player.Player import Player
 from socket import socket
 
@@ -14,26 +15,41 @@ class Human(Player):
         self.name = self.socket.recv(1024).decode("utf-8")
 
     def play(self, playerBoard: Board, ennemyBoard: Board) -> Board:
-        # TODO: la vérification des tirs est pas bonne 
-        self.socket.send("play".encode())
+        t = Timer(5)
+        t.start()
 
-        res = playerBoard.drawHeader()
-        for i in range(10):
-            res += playerBoard.drawLineWithShipsAndShots(i)
-            res += 10 * " "
-            res += ennemyBoard.drawLineWithShots(i)
-            res += "\n"
+        while t.is_alive():
+            # TODO: la vérification des tirs est pas bonne 
+            self.socket.send("play".encode())
 
-        res += "# - - - - - - - - - - #" + 10 * " " + "# - - - - - - - - - - #\n"
+            res = playerBoard.drawHeader()
+            for i in range(10):
+                res += playerBoard.drawLineWithShipsAndShots(i)
+                res += 10 * " "
+                res += ennemyBoard.drawLineWithShots(i)
+                res += "\n"
 
-        self.socket.send(res.encode())
+            res += "# - - - - - - - - - - #" + 10 * " " + "# - - - - - - - - - - #\n"
 
-        message = self.socket.recv(1024).decode("utf-8")
-        coords = message.split(",")
+            self.socket.send(res.encode())
 
-        while True:
-            try:
-                if not ennemyBoard.isShotPositionValid(int(coords[0]), int(coords[1])):
+            message = self.socket.recv(1024).decode("utf-8")
+            coords = message.split(",")
+
+            while True:
+                try:
+                    if not ennemyBoard.isShotPositionValid(int(coords[0]), int(coords[1])):
+                        self.socket.send("play\n".encode())
+                        self.socket.send(
+                            "La position de tir que vous avez entrez n'est pas valide, veuillez en entrez une nouvelle.\n".encode()
+                        )
+                        message = self.socket.recv(1024).decode("utf-8")
+                        coords = message.split(",")
+
+                    else:
+                        break
+
+                except Exception:
                     self.socket.send("play\n".encode())
                     self.socket.send(
                         "La position de tir que vous avez entrez n'est pas valide, veuillez en entrez une nouvelle.\n".encode()
@@ -41,18 +57,9 @@ class Human(Player):
                     message = self.socket.recv(1024).decode("utf-8")
                     coords = message.split(",")
 
-                else:
-                    break
-
-            except Exception:
-                self.socket.send("play\n".encode())
-                self.socket.send(
-                    "La position de tir que vous avez entrez n'est pas valide, veuillez en entrez une nouvelle.\n".encode()
-                )
-                message = self.socket.recv(1024).decode("utf-8")
-                coords = message.split(",")
-
-        ennemyBoard.shot(int(coords[0]), int(coords[1]))
+            ennemyBoard.shot(int(coords[0]), int(coords[1]))
+        
+        self.socket.send("out of time".encode())
         return ennemyBoard
 
     def getShip(self, board: Board, size: int) -> Ship:
@@ -122,3 +129,8 @@ class Human(Player):
 
     def lose(self):
         self.socket.send("Vous avez perdu !".encode())
+
+    def getGamemode(self) -> str:
+        self.socket.send("gamemode".encode())
+        return self.socket.recv(1024).decode("utf-8") 
+

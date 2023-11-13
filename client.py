@@ -40,6 +40,11 @@ while True:
         elif message == "medium boat":
             placeBoat(3)
 
+        elif message == "gamemode":
+            gamemode = input("Choisissez un mode de jeu (s)olo ou (m)ultijoueur : ")
+            client_socket.send(gamemode.encode())
+
+
         elif message == "big boat":
             placeBoat(4)
 

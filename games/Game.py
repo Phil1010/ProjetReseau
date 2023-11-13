@@ -1,10 +1,14 @@
 from abc import ABC, abstractmethod
+from threading import Thread
 from board import Board
+from chrono import Timer
 from player.Player import Player
 
 
-class Game(ABC):
+class Game(Thread):
     def __init__(self, playerA: Player, playerB: Player):
+        super().__init__()
+
         self.playerA = playerA
         self.playerB = playerB
         self.boardPlayerA = Board(playerA.name)
@@ -47,3 +51,7 @@ class Game(ABC):
 
     def drawGame(self) -> str:
         return ""
+    
+    def run(self):
+        while not self.isFinished():
+            self.nextTurn()
