@@ -134,3 +134,5 @@ class Human(Player):
         self.socket.send("gamemode".encode())
         return self.socket.recv(1024).decode("utf-8") 
 
+    def duration(self, duree: int):
+        pass

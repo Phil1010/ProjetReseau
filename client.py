@@ -1,3 +1,4 @@
+from math import e
 import socket
 
 from ship import Ship, ShipEncoder
