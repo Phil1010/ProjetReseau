@@ -3,7 +3,6 @@ import pickle
 import time
 from typing import List
 from board import Board
-from chrono import Timer
 from coordinate import Coordinate
 from message import Message
 from player.Player import Player
@@ -70,3 +69,5 @@ class Human(Player):
 
         self.socket.send(pickle.dumps(Message("set grid", res))+ "\r\n".encode())
 
+    def duration(self, duree: int):
+        pass
