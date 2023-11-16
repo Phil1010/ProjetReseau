@@ -1,7 +1,11 @@
 import json
+import pickle
+import time
 from typing import List
 from board import Board
 from chrono import Timer
+from coordinate import Coordinate
+from message import Message
 from player.Player import Player
 from socket import socket
 
@@ -12,125 +16,57 @@ class Human(Player):
     def __init__(self, socket: socket):
         super().__init__("human")
         self.socket = socket
-        self.name = self.socket.recv(1024).decode("utf-8")
+        self.name = self.get_username()
 
-    def play(self, playerBoard: Board, ennemyBoard: Board) -> Board:
-        t = Timer(5)
-        t.start()
+    def get_username(self) -> str:
+        self.socket.send(pickle.dumps(Message("get username", "")) + "\r\n".encode())
+        return pickle.loads(self.socket.recv(1024)).content
 
-        while t.is_alive():
-            # TODO: la vérification des tirs est pas bonne 
-            self.socket.send("play".encode())
+    def get_shot(self) -> Coordinate:
+        self.socket.send(pickle.dumps(Message("get shot", ""))+ "\r\n".encode())
+        return pickle.loads(pickle.loads(self.socket.recv(1024)).content)
 
-            res = playerBoard.drawHeader()
-            for i in range(10):
-                res += playerBoard.drawLineWithShipsAndShots(i)
-                res += 10 * " "
-                res += ennemyBoard.drawLineWithShots(i)
-                res += "\n"
+    def get_ship(self, size: int) -> Ship:
+        self.socket.send(pickle.dumps(Message("get boat", size))+ "\r\n".encode())
+        s = pickle.loads(pickle.loads(self.socket.recv(1024)).content)
+        return s
 
-            res += "# - - - - - - - - - - #" + 10 * " " + "# - - - - - - - - - - #\n"
+    def get_room(self) -> str:
+        self.socket.send(pickle.dumps(Message("get room", ""))+ "\r\n".encode())
+        return pickle.loads(self.socket.recv(1024)).content
 
-            self.socket.send(res.encode())
+    def create_room(self) -> str:
+        self.socket.send(pickle.dumps(Message("create room", ""))+ "\r\n".encode())
+        return pickle.loads(self.socket.recv(1024)).content
 
-            message = self.socket.recv(1024).decode("utf-8")
-            coords = message.split(",")
+    def join_room(self, rooms) -> str:
+        self.socket.send(pickle.dumps(Message("show room", pickle.dumps(list(rooms.keys()))))+ "\r\n".encode())
+        self.socket.send(pickle.dumps(Message("join room", ""))+ "\r\n".encode())
+        return pickle.loads(self.socket.recv(1024)).content
 
-            while True:
-                try:
-                    if not ennemyBoard.isShotPositionValid(int(coords[0]), int(coords[1])):
-                        self.socket.send("play\n".encode())
-                        self.socket.send(
-                            "La position de tir que vous avez entrez n'est pas valide, veuillez en entrez une nouvelle.\n".encode()
-                        )
-                        message = self.socket.recv(1024).decode("utf-8")
-                        coords = message.split(",")
+    def send_error(self, message: str) -> str:
+        self.socket.send(pickle.dumps(Message("", message))+ "\r\n".encode())
 
-                    else:
-                        break
+    def set_win(self) -> None:
+        self.socket.send(pickle.dumps(Message("end game", "Vous avez gagné"))+ "\r\n".encode())
 
-                except Exception:
-                    self.socket.send("play\n".encode())
-                    self.socket.send(
-                        "La position de tir que vous avez entrez n'est pas valide, veuillez en entrez une nouvelle.\n".encode()
-                    )
-                    message = self.socket.recv(1024).decode("utf-8")
-                    coords = message.split(",")
+    def set_lose(self) -> None:
+        self.socket.send(pickle.dumps(Message("end game", "Vous avez perdu"))+ "\r\n".encode())
 
-            ennemyBoard.shot(int(coords[0]), int(coords[1]))
+    def get_gamemode(self) -> str:
+        self.socket.send(pickle.dumps(Message("get gamemode", ""))+ "\r\n".encode())
+        return pickle.loads(self.socket.recv(1024)).content
         
-        self.socket.send("out of time".encode())
-        return ennemyBoard
 
-    def getShip(self, board: Board, size: int) -> Ship:
-        # self.socket.send("boat\n".encode())
+    def set_grid(self, playerBoard, ennemyBoard: Board) -> None:
+        res = playerBoard.drawHeader()
+        for i in range(10):
+            res += playerBoard.drawLineWithShipsAndShots(i)
+            res += 10 * " "
+            res += ennemyBoard.drawLineWithShots(i)
+            res += "\n"
 
-        if size == 2:
-            self.socket.send("small boat\n".encode())
-        if size == 3:
-            self.socket.send("medium boat\n".encode())
-        if size == 4:
-            self.socket.send("big boat\n".encode())
+        res += "# - - - - - - - - - - #" + 10 * " " + "# - - - - - - - - - - #\n"
 
-        shipJson = self.socket.recv(1024).decode("utf-8")  # demande d'un bateau
-        shipDict = json.loads(shipJson)  # json -> python dict
-
-        while True:
-            try:
-                int(shipDict["x"])
-                int(shipDict["y"])
-                # TODO: vérifier si l'orientation est bonne
-                break
-            except:
-                self.socket.send(
-                    "Le bateau ne peut pas être placé ici, la place est déjà prise ou le placement indiqué est invalide.\n".encode()
-                )
-                if size == 2:
-                    self.socket.send("small boat\n".encode())
-                if size == 3:
-                    self.socket.send("medium boat\n".encode())
-                if size == 4:
-                    self.socket.send("big boat\n".encode())
-                shipJson = self.socket.recv(1024).decode("utf-8")  # demande d'un bateau
-                shipDict = json.loads(shipJson)  # json -> python dict
-
-        ship = Ship(
-            int(shipDict["x"]),
-            int(shipDict["y"]),
-            size,
-            shipDict["orientation"],
-        )
-
-        while not board.isShipPlacable(ship):
-            # TODO: pb le bateau peut être placé a moitié dans la grille et a moitié pas dans la grille 
-            self.socket.send(
-                "Le bateau ne peut pas être placé ici, la place est déjà prise ou le placement indiqué est invalide.\n".encode()
-            )
-            if size == 2:
-                self.socket.send("small boat\n".encode())
-            if size == 3:
-                self.socket.send("medium boat\n".encode())
-            if size == 4:
-                self.socket.send("big boat\n".encode())
-
-            shipJson = self.socket.recv(1024).decode("utf-8")  # demande d'un bateau
-            shipDict = json.loads(shipJson)  # json -> python dict
-            ship = Ship(
-                int(shipDict["x"]),
-                int(shipDict["y"]),
-                size,
-                shipDict["orientation"],
-            )
-
-        return ship
-
-    def win(self):
-        self.socket.send("Vous avez gagné !".encode())
-
-    def lose(self):
-        self.socket.send("Vous avez perdu !".encode())
-
-    def getGamemode(self) -> str:
-        self.socket.send("gamemode".encode())
-        return self.socket.recv(1024).decode("utf-8") 
+        self.socket.send(pickle.dumps(Message("set grid", res))+ "\r\n".encode())
 

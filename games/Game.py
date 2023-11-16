@@ -1,11 +1,12 @@
 from abc import ABC, abstractmethod
+
+from re import I
 from threading import Thread
 from board import Board
-from chrono import Timer
 from player.Player import Player
 
 
-class Game(Thread):
+class Game(ABC, Thread):
     def __init__(self, playerA: Player, playerB: Player):
         super().__init__()
 
@@ -18,21 +19,27 @@ class Game(Thread):
         self.initShips()
 
     def initShips(self):
-        # TODO: faire ca en plus propre
-        self.boardPlayerA.addShip(self.playerA.getShip(self.boardPlayerA, 2))
-        self.boardPlayerA.addShip(self.playerA.getShip(self.boardPlayerA, 3))
-        self.boardPlayerA.addShip(self.playerA.getShip(self.boardPlayerA, 4))
+        # initialisation des bateaux du joueur A
+        self.boardPlayerA.addShip(self.playerA.get_ship(2))
+        self.boardPlayerA.addShip(self.playerA.get_ship(3))
+        self.boardPlayerA.addShip(self.playerA.get_ship(4))
 
-        self.boardPlayerB.addShip(self.playerB.getShip(self.boardPlayerB, 2))
-        self.boardPlayerB.addShip(self.playerB.getShip(self.boardPlayerB, 3))
-        self.boardPlayerB.addShip(self.playerB.getShip(self.boardPlayerB, 4))
+        # initialisation des bateaux du joueur B
+        self.boardPlayerB.addShip(self.playerB.get_ship(2))
+        self.boardPlayerB.addShip(self.playerB.get_ship(3))
+        self.boardPlayerB.addShip(self.playerB.get_ship(4))
+
+        self.playerA.set_grid(self.boardPlayerA, self.boardPlayerB)
+        self.playerB.set_grid(self.boardPlayerB, self.boardPlayerA)
 
     def nextTurn(self):
         if self.turn % 2 == 0:
-            self.boardPlayerB = self.playerA.play(self.boardPlayerA, self.boardPlayerB)
+            self.boardPlayerB.shot(self.playerA.get_shot())
+            self.playerA.set_grid(self.boardPlayerA, self.boardPlayerB)
 
         else:
-            self.boardPlayerA = self.playerB.play(self.boardPlayerB, self.boardPlayerA)
+            self.boardPlayerA.shot(self.playerB.get_shot())
+            self.playerB.set_grid(self.boardPlayerB, self.boardPlayerA)
 
         self.turn += 1
 
@@ -41,17 +48,14 @@ class Game(Thread):
 
         if finished:
             if not self.boardPlayerA.is_win():
-                self.playerA.win()
-                self.playerB.lose()
+                self.playerA.set_win()
+                self.playerB.set_lose()
             else:
-                self.playerB.win()
-                self.playerA.lose()
+                self.playerB.set_win()
+                self.playerA.set_lose()
 
         return finished
 
-    def drawGame(self) -> str:
-        return ""
-    
     def run(self):
         while not self.isFinished():
             self.nextTurn()

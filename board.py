@@ -1,3 +1,4 @@
+from coordinate import Coordinate
 import ship
 
 
@@ -59,6 +60,7 @@ class Board:
                 raise Exception("Le bateau ne rentre pas dans le plateau")
             for i in range(ship.size):
                 if self.grid[ship.y + i][ship.x] != "~":
+                    print("wtf", self.grid[ship.y + i][ship.x])
                     raise Exception("Il y a déjà un bateau à cet endroit")
                 self.grid[ship.y + i][ship.x] = "*"
         else:
@@ -71,7 +73,9 @@ class Board:
         # Ajoute un bateau au plateau
         self.ships.append(ship)
 
-    def shot(self, x, y):
+    def shot(self, coordinate: Coordinate):
+        x = coordinate.x
+        y = coordinate.y
         ships_location = []
         for ship in self.ships:
             ships_location.extend(
@@ -87,9 +91,11 @@ class Board:
             self.missed_shots.append((x, y))
             self.grid[y][x] = "-"
 
+        print(x, y)
+        print(self.drawFullBoard())
         return self.grid
 
-    def is_win(self):
+    def is_win(self) -> bool:
         # Vérifiez si tous les bateaux sont coulés
         if self.drawFullBoard().count("*") == 0:
             return True
@@ -144,8 +150,3 @@ class Board:
 
         return True
 
-    def isShotPositionValid(self, x, y: int) -> bool:
-        if x >= 0 and x < 10 and y >= 0 and y < 10:
-            return True
-
-        return False

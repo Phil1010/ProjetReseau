@@ -5,6 +5,7 @@ from abc import (
 from typing import List
 
 from board import Board
+from coordinate import Coordinate
 from ship import Ship
 
 
@@ -13,17 +14,29 @@ class Player(ABC):
         self.name = name
 
     @abstractmethod
-    def play(self, playerBoard: Board, ennemyBoard: Board) -> Board:
+    def get_username(self) -> str:
         pass
 
     @abstractmethod
-    def getShip(self, board: Board, size: int) -> Ship:
+    def get_shot(self) -> Coordinate:
         pass
 
     @abstractmethod
-    def win(self) -> None:
+    def get_ship(self, size: int) -> Ship:
         pass
 
     @abstractmethod
-    def lose(self) -> None:
+    def set_win(self) -> None:
+        pass
+
+    @abstractmethod
+    def set_lose(self) -> None:
+        pass
+
+    @abstractmethod
+    def get_gamemode(self) -> str:
+        pass
+
+    @abstractmethod
+    def set_grid(self, playerBoard, ennemyBoard: Board) -> None:
         pass

@@ -1,18 +1,20 @@
-from http import client
+import pickle
 from socket import socket, AF_INET, SOCK_STREAM
 from threading import Thread
+import threading
 from typing import List
 from games.MultiplayerGame import MultiplayerGame
 from games.SoloGame import SoloGame
+from message import Message
 from player.Human import Human
-from chrono import Timer
 
 
 class HandleClient(Thread):
-    def __init__(self, human: Human, playerList: List):
+    def __init__(self, human: Human, playerList: List, room_list: List):
         super().__init__()
         self.human = human
         self.playerList = playerList
+        self.room_list = room_list
 
     def pvp(self, humanA, humanB: Human):
         game = MultiplayerGame(humanA, humanB)
@@ -23,38 +25,47 @@ class HandleClient(Thread):
         game.start()
 
     def run(self):
-        gamemode = self.human.getGamemode()
-        print("gamemode == s", gamemode == "s")
+        gamemode = self.human.get_gamemode()
+        
         if gamemode == "s":
-            print("solo")
             self.solo(self.human)
         elif gamemode == "m":
-            if len(self.playerList) == 2:
-                self.pvp(self.playerList[0], self.playerList[1])
-                self.playerList.clear()
+            room = self.human.get_room()
+            if room == "c":
+                room_name = self.human.create_room()
+                if room_name in self.room_list:
+                    self.human.send_error("ERREUR : Ce nom de salle existe déjà !") 
+                else:
+                    self.room_list[room_name] = [self.human]
+            elif room == "r":
+                room_name = self.human.join_room(self.room_list)
+                if not room_name in self.room_list:
+                    self.human.send_error("ERREUR : Cette salle n'existe pas!") 
+                else:
+                    self.room_list[room_name].append(self.human)
 
+                if len(self.room_list[room_name]) == 2:
+                    print("pvp start")
+                    self.pvp(self.room_list[room_name][0], self.room_list[room_name][1])
+                    self.room_list.pop(room_name, None)
+
+            
 
 class Server():
     def __init__(self, host, port):
         self.socket = socket(AF_INET, SOCK_STREAM)
         self.socket.bind((host, port))
-
         self.clientList = []
+        self.room_list = {}
 
     def run(self):
         self.socket.listen(2)
         while True:
             client_socket, client_address = self.socket.accept()
-
             human = Human(client_socket)
             self.clientList.append(human)
-            handler = HandleClient(human, self.clientList)
+            handler = HandleClient(human, self.clientList, self.room_list)
             handler.start()
-
-
-            # print(len(self.clientList))
-            # if len(self.clientList) == 2:
-            #     self.pvp(self.clientList[0], self.clientList[1])
 
         client_socket.close()
         server_socket.close()
