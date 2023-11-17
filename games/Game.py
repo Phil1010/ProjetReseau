@@ -2,7 +2,9 @@ from abc import ABC, abstractmethod
 
 from re import I
 from threading import Thread
+import threading
 from board import Board
+from chrono import Chronometre, Timer
 from player.Player import Player
 
 
@@ -17,6 +19,9 @@ class Game(ABC, Thread):
         self.turn = 0
 
         self.initShips()
+        
+        self.stop_chronometer = threading.Event()
+        self.chronometer = Chronometre(self.playerA, self.playerB, self.stop_chronometer).start()
 
     def initShips(self):
         # initialisation des bateaux du joueur A
@@ -32,12 +37,15 @@ class Game(ABC, Thread):
         self.playerA.set_grid(self.boardPlayerA, self.boardPlayerB)
         self.playerB.set_grid(self.boardPlayerB, self.boardPlayerA)
 
+
     def nextTurn(self):
         if self.turn % 2 == 0:
+            Timer(self.playerA, 20).start() 
             self.boardPlayerB.shot(self.playerA.get_shot(self.boardPlayerB))
             self.playerA.set_grid(self.boardPlayerA, self.boardPlayerB)
 
         else:
+            Timer(self.playerB, 20).start() 
             self.boardPlayerA.shot(self.playerB.get_shot(self.boardPlayerA))
             self.playerB.set_grid(self.boardPlayerB, self.boardPlayerA)
 
@@ -47,6 +55,8 @@ class Game(ABC, Thread):
         finished = self.boardPlayerA.is_win() or self.boardPlayerB.is_win()
 
         if finished:
+            self.stop_chronometer.set()
+
             if not self.boardPlayerA.is_win():
                 self.playerA.set_win()
                 self.playerB.set_lose()

@@ -33,3 +33,9 @@ class Bot(Player):
 
     def set_grid(self, playerBoard, ennemyBoard: Board) -> None:
         pass
+
+    def notify(self, duree: int):
+        pass
+
+    def timeout(self):
+        pass

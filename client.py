@@ -1,17 +1,17 @@
 import pickle
 import socket
 from threading import Thread
-from coordinate import Coordinate
 from message import Message
 from shot import Shot
-
-from ship import Ship, ShipEncoder
+import random
+from ship import Ship
 
 class Client(Thread):
     def __init__(self, host: str, port: int):
         super().__init__()
         self.host = host
         self.port = port
+        self.timeout = False
 
     def run(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -46,6 +46,12 @@ class Client(Thread):
                 elif message.action == "get shot":
                     x = input("Choissisez une position x : ")
                     y = input("Choisissez une position y : ")
+
+                    if self.timeout:
+                        print("Vous avez mis trop de temps a jouer !")
+                        x = random.randint(0, 9) 
+                        y = random.randint(0, 9)
+                        self.timeout = False
                     self.socket.send(pickle.dumps(Message("set shot", pickle.dumps(Shot(int(x), int(y))))))
 
                 elif message.action == "get boat":
@@ -57,6 +63,12 @@ class Client(Thread):
 
                 elif message.action == "set grid":
                     print(message.content)
+
+                elif message.action == "set chronometer":
+                    print(f"La partie a duré : {message.content}")
+
+                elif message.action == "set timeout":
+                    self.timeout = True
 
                 else:
                     print("ERREUR", message.action, message.content)

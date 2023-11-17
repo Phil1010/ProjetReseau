@@ -106,5 +106,9 @@ class Human(Player):
 
         self.socket.send(pickle.dumps(Message("set grid", res))+ "\r\n".encode())
 
-    def duration(self, duree: int):
-        pass
+    def notify(self, duree: int):
+        self.socket.send(pickle.dumps(Message("set chronometer", duree)))
+
+    def timeout(self):
+        self.socket.send(pickle.dumps(Message("set timeout", "")))
+

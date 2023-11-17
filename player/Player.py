@@ -39,3 +39,11 @@ class Player(ABC):
     @abstractmethod
     def set_grid(self, playerBoard, ennemyBoard: Board) -> None:
         pass
+
+    @abstractmethod
+    def notify(self, chronometer: int):
+        pass
+
+    @abstractmethod
+    def timeout(self):
+        pass
