@@ -10,7 +10,7 @@ from player.Human import Human
 
 
 class HandleClient(Thread):
-    def __init__(self, human: Human, playerList: List, room_list: List):
+    def __init__(self, human: Human, playerList: List, room_list):
         super().__init__()
         self.human = human
         self.playerList = playerList
@@ -32,20 +32,14 @@ class HandleClient(Thread):
         elif gamemode == "m":
             room = self.human.get_room()
             if room == "c":
-                room_name = self.human.create_room()
-                if room_name in self.room_list:
-                    self.human.send_error("ERREUR : Ce nom de salle existe déjà !") 
-                else:
-                    self.room_list[room_name] = [self.human]
+                room_name = self.human.create_room(self.room_list)
+                self.room_list[room_name] = [self.human]
+
             elif room == "r":
                 room_name = self.human.join_room(self.room_list)
-                if not room_name in self.room_list:
-                    self.human.send_error("ERREUR : Cette salle n'existe pas!") 
-                else:
-                    self.room_list[room_name].append(self.human)
+                self.room_list[room_name].append(self.human)
 
                 if len(self.room_list[room_name]) == 2:
-                    print("pvp start")
                     self.pvp(self.room_list[room_name][0], self.room_list[room_name][1])
                     self.room_list.pop(room_name, None)
 

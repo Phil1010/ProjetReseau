@@ -2,11 +2,10 @@ from abc import (
     ABC,
     abstractmethod,
 )
-from typing import List
 
 from board import Board
-from coordinate import Coordinate
 from ship import Ship
+from shot import Shot
 
 
 class Player(ABC):
@@ -18,11 +17,11 @@ class Player(ABC):
         pass
 
     @abstractmethod
-    def get_shot(self) -> Coordinate:
+    def get_shot(self, board: Board) -> Shot:
         pass
 
     @abstractmethod
-    def get_ship(self, size: int) -> Ship:
+    def get_ship(self, board: Board, size: int) -> Ship:
         pass
 
     @abstractmethod

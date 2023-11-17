@@ -1,5 +1,6 @@
 from coordinate import Coordinate
 import ship
+from shot import Shot
 
 
 class Board:
@@ -52,30 +53,44 @@ class Board:
             res += self.drawLineWithShipsAndShots(i) + "\n"
         res += "# - - - - - - - - - - #\n"
         return res
+    
+    def is_ship_position_valid(self, ship: ship.Ship):
+        if not (ship.orientation == "v" or ship.orientation == "h"):
+            return False
+
+        if ship.x < 0 or ship.y < 0:
+            return False
+
+        if ship.orientation == "v" and ship.y + ship.size > 9:
+            return False
+
+        if ship.orientation == "h" and ship.x + ship.size > 10:
+            return False
+
+        for i in range(ship.size):
+            if ship.orientation == "v" and self.grid[ship.y + i][ship.x] != "~":
+                return False
+
+            elif ship.orientation == "h" and self.grid[ship.y][ship.x + i] != "~":
+                return False
+
+        return True
+
 
     def addShip(self, ship: ship.Ship):
-        # test si le bateau rentre dans le plateau et si il n'y a pas de bateau déjà présent
-        if ship.orientation == "v":
-            if ship.y + ship.size > 10:
-                raise Exception("Le bateau ne rentre pas dans le plateau")
+        if self.is_ship_position_valid(ship):
             for i in range(ship.size):
-                if self.grid[ship.y + i][ship.x] != "~":
-                    print("wtf", self.grid[ship.y + i][ship.x])
-                    raise Exception("Il y a déjà un bateau à cet endroit")
-                self.grid[ship.y + i][ship.x] = "*"
-        else:
-            if ship.x + ship.size > 10:
-                raise Exception("Le bateau ne rentre pas dans le plateau")
-            for i in range(ship.size):
-                if self.grid[ship.y][ship.x + i] != "~":
-                    raise Exception("Il y a déjà un bateau à cet endroit")
-                self.grid[ship.y][ship.x + i] = "*"
-        # Ajoute un bateau au plateau
-        self.ships.append(ship)
+                if ship.orientation == "v":
+                    self.grid[ship.y + i][ship.x] = "*"
+                
+                if ship.orientation == "h":
+                    self.grid[ship.y][ship.x + i] = "*"
 
-    def shot(self, coordinate: Coordinate):
-        x = coordinate.x
-        y = coordinate.y
+            self.ships.append(ship)
+
+    def shot(self, shot: Shot):
+        x = shot.coordinate.x
+        y = shot.coordinate.y
         ships_location = []
         for ship in self.ships:
             ships_location.extend(
@@ -150,3 +165,5 @@ class Board:
 
         return True
 
+    def is_shot_valid(self, shot: Shot) -> bool:
+        return shot.coordinate.x >= 0 and shot.coordinate.x <= 9 and shot.coordinate.y >= 0 and shot.coordinate.y <= 9

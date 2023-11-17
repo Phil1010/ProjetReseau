@@ -3,6 +3,7 @@ import socket
 from threading import Thread
 from coordinate import Coordinate
 from message import Message
+from shot import Shot
 
 from ship import Ship, ShipEncoder
 
@@ -45,7 +46,7 @@ class Client(Thread):
                 elif message.action == "get shot":
                     x = input("Choissisez une position x : ")
                     y = input("Choisissez une position y : ")
-                    self.socket.send(pickle.dumps(Message("set shot", pickle.dumps(Coordinate(int(x), int(y))))))
+                    self.socket.send(pickle.dumps(Message("set shot", pickle.dumps(Shot(int(x), int(y))))))
 
                 elif message.action == "get boat":
                     size = int(message.content)

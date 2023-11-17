@@ -20,25 +20,25 @@ class Game(ABC, Thread):
 
     def initShips(self):
         # initialisation des bateaux du joueur A
-        self.boardPlayerA.addShip(self.playerA.get_ship(2))
-        self.boardPlayerA.addShip(self.playerA.get_ship(3))
-        self.boardPlayerA.addShip(self.playerA.get_ship(4))
+        self.boardPlayerA.addShip(self.playerA.get_ship(self.boardPlayerA, 2))
+        self.boardPlayerA.addShip(self.playerA.get_ship(self.boardPlayerA, 3))
+        self.boardPlayerA.addShip(self.playerA.get_ship(self.boardPlayerA, 4))
 
         # initialisation des bateaux du joueur B
-        self.boardPlayerB.addShip(self.playerB.get_ship(2))
-        self.boardPlayerB.addShip(self.playerB.get_ship(3))
-        self.boardPlayerB.addShip(self.playerB.get_ship(4))
+        self.boardPlayerB.addShip(self.playerB.get_ship(self.boardPlayerB, 2))
+        self.boardPlayerB.addShip(self.playerB.get_ship(self.boardPlayerB, 3))
+        self.boardPlayerB.addShip(self.playerB.get_ship(self.boardPlayerB, 4))
 
         self.playerA.set_grid(self.boardPlayerA, self.boardPlayerB)
         self.playerB.set_grid(self.boardPlayerB, self.boardPlayerA)
 
     def nextTurn(self):
         if self.turn % 2 == 0:
-            self.boardPlayerB.shot(self.playerA.get_shot())
+            self.boardPlayerB.shot(self.playerA.get_shot(self.boardPlayerB))
             self.playerA.set_grid(self.boardPlayerA, self.boardPlayerB)
 
         else:
-            self.boardPlayerA.shot(self.playerB.get_shot())
+            self.boardPlayerA.shot(self.playerB.get_shot(self.boardPlayerA))
             self.playerB.set_grid(self.boardPlayerB, self.boardPlayerA)
 
         self.turn += 1
