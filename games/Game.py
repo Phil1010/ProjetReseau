@@ -8,6 +8,7 @@ from board import Board
 from chrono import Chronometre, Timer
 from player.Player import Player
 import random
+import time
 
 
 class Game(ABC, Thread):
@@ -27,6 +28,7 @@ class Game(ABC, Thread):
 
     def initShips(self):
         # initialisation des bateaux du joueur A
+        self.playerA.set_grid(self.boardPlayerA, self.boardPlayerB, self.playerA, self.playerB)
         self.boardPlayerA.addShip(self.playerA.get_ship(self.boardPlayerA, 2))
         self.playerA.set_grid(self.boardPlayerA, self.boardPlayerB, self.playerA, self.playerB)
         self.boardPlayerA.addShip(self.playerA.get_ship(self.boardPlayerA, 3))
@@ -35,6 +37,7 @@ class Game(ABC, Thread):
         self.playerA.set_grid(self.boardPlayerA, self.boardPlayerB, self.playerA, self.playerB)
 
         # initialisation des bateaux du joueur B
+        self.playerB.set_grid(self.boardPlayerB, self.boardPlayerA, self.playerB, self.playerA)
         self.boardPlayerB.addShip(self.playerB.get_ship(self.boardPlayerB, 2))
         self.playerB.set_grid(self.boardPlayerB, self.boardPlayerA, self.playerB, self.playerA)
         self.boardPlayerB.addShip(self.playerB.get_ship(self.boardPlayerB, 3))
@@ -83,6 +86,10 @@ class Game(ABC, Thread):
             else:
                 self.playerB.set_win()
                 self.playerA.set_lose()
+            
+            time.sleep(1)
+            self.playerA.set_exit()
+            self.playerB.set_exit()
 
         return finished
 

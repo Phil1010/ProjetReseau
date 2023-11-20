@@ -28,7 +28,6 @@ class HandleClient(Thread):
         self.human = Human(self.client_socket)
         self.playerList.append(self.human)
 
-
         gamemode = self.human.get_gamemode()
         
         if gamemode == "s":
@@ -68,5 +67,5 @@ class Server():
 
 
 
-s = Server("192.168.246.126", 12345)
+s = Server("127.0.0.1", 12345)
 s.run()

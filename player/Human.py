@@ -19,6 +19,7 @@ class Human(Player):
         self.socket.send(pickle.dumps(Message("get username", "")) + "\r\n".encode())
         message = pickle.loads(self.socket.recv(1024))
         while message.content.strip() == "":
+            self.socket.send(pickle.dumps(Message("ERROR", "pseudo invalide")) + "\r\n".encode())
             self.socket.send(pickle.dumps(Message("get username", "")) + "\r\n".encode())
             message = pickle.loads(self.socket.recv(1024))
         return message.content
@@ -26,8 +27,15 @@ class Human(Player):
     def get_shot(self, board: Board) -> Shot:
         self.socket.send(pickle.dumps(Message("get shot", ""))+ "\r\n".encode())
         message = pickle.loads(self.socket.recv(1024))
+
+        if message.content == "ameno":
+            print("AMENO")
+            coo = board.find_boat()
+            return Shot(coo.x, coo.y)
+
         shot = pickle.loads(message.content)
         while not board.is_shot_valid(shot):
+            self.socket.send(pickle.dumps(Message("ERROR", "tir invalide")) + "\r\n".encode())
             self.socket.send(pickle.dumps(Message("get shot", ""))+ "\r\n".encode())
             message = pickle.loads(self.socket.recv(1024))
             shot = pickle.loads(message.content)
@@ -38,6 +46,7 @@ class Human(Player):
         message = pickle.loads(self.socket.recv(1024))
         ship = pickle.loads(message.content)
         while not board.is_ship_position_valid(ship):
+            self.socket.send(pickle.dumps(Message("ERROR", "bateau invalide")) + "\r\n".encode())
             self.socket.send(pickle.dumps(Message("get boat", size))+ "\r\n".encode())
             message = pickle.loads(self.socket.recv(1024))
             ship = pickle.loads(message.content)
@@ -47,6 +56,7 @@ class Human(Player):
         self.socket.send(pickle.dumps(Message("get room", ""))+ "\r\n".encode())
         message = pickle.loads(self.socket.recv(1024))
         while not (message.content == "c" or message.content == "r"):
+            self.socket.send(pickle.dumps(Message("ERROR", "choix invalide")) + "\r\n".encode())
             print("error")
             self.socket.send(pickle.dumps(Message("get room", ""))+ "\r\n".encode())
             message = pickle.loads(self.socket.recv(1024))
@@ -57,6 +67,7 @@ class Human(Player):
         self.socket.send(pickle.dumps(Message("create room", ""))+ "\r\n".encode())
         message = pickle.loads(self.socket.recv(1024))
         while message.content in room_list:
+            self.socket.send(pickle.dumps(Message("ERROR", "invalide")) + "\r\n".encode())
             self.socket.send(pickle.dumps(Message("create room", ""))+ "\r\n".encode())
             message = pickle.loads(self.socket.recv(1024))
 
@@ -67,6 +78,7 @@ class Human(Player):
         self.socket.send(pickle.dumps(Message("join room", ""))+ "\r\n".encode())
         message = pickle.loads(self.socket.recv(1024))
         while not message.content in room_list:
+            self.socket.send(pickle.dumps(Message("ERROR", "invalide")) + "\r\n".encode())
             self.socket.send(pickle.dumps(Message("show room", pickle.dumps(list(room_list.keys()))))+ "\r\n".encode())
             self.socket.send(pickle.dumps(Message("join room", ""))+ "\r\n".encode())
             message = pickle.loads(self.socket.recv(1024))
@@ -81,6 +93,9 @@ class Human(Player):
 
     def set_lose(self) -> None:
         self.socket.send(pickle.dumps(Message("end game", "Vous avez perdu"))+ "\r\n".encode())
+
+    def set_exit(self) -> None:
+        self.socket.send(pickle.dumps(Message("exit", ""))+ "\r\n".encode())
 
     def get_gamemode(self) -> str:
         self.socket.send(pickle.dumps(Message("get gamemode", ""))+ "\r\n".encode())
@@ -101,7 +116,7 @@ class Human(Player):
             res += ennemyBoard.drawLineWithShots(i)
             res += "\n"
 
-        res += "# ! ! ! ! ! ! ! ! ! ! #" + 10 * " " + "# ! ! ! ! ! ! ! ! ! ! #\n"
+        res += "# ! ! ! ! ! ! ! ! ! ! #" + 10 * " " + " # ! ! ! ! ! ! ! ! ! ! #\n"
 
         res = res.replace("votre plateau",playerA.name)
         res = res.replace("plateau ennemi",playerB.name)
@@ -113,4 +128,4 @@ class Human(Player):
 
     def timeout(self):
         self.socket.send(pickle.dumps(Message("set timeout", "")))
-
+    

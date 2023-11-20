@@ -47,3 +47,7 @@ class Player(ABC):
     @abstractmethod
     def timeout(self):
         pass
+
+    @abstractmethod
+    def set_exit(self) -> None:
+        pass

@@ -20,11 +20,11 @@ class Board:
 |___/\__,_|\__\__,_|_|_|_\___| |_||_\__,_|\_/\__,_|_\___|
 \n"""
 
-        res += "# - - - - - - - - - - #" + 10 * " " + "# - - - - - - - - - - #\n"
+        res += "# ! ! ! ! ! ! ! ! ! ! #" + 10 * " " + "# ! ! ! ! ! ! ! ! ! ! #\n"
         res += "     votre plateau     " + 10 * " " + "          plateau ennemi    \n"
-        res += "# - - - - - - - - - - #" + 10 * " " + "# - - - - - - - - - - #\n\n"
+        res += "# ! ! ! ! ! ! ! ! ! ! #" + 10 * " " + "# ! ! ! ! ! ! ! ! ! ! #\n\n"
 
-        res += "# 0 1 2 3 4 5 6 7 8 9 #" + 10 * " " + "# 0 1 2 3 4 5 6 7 8 9 #\n"
+        res += "# 0 1 2 3 4 5 6 7 8 9 #" + 10 * " " + " # 0 1 2 3 4 5 6 7 8 9 #\n"
         return res
 
     def drawLineWithoutShip(self, n: int) -> str:
@@ -174,3 +174,11 @@ class Board:
 
     def is_shot_valid(self, shot: Shot) -> bool:
         return shot.coordinate.x >= 0 and shot.coordinate.x <= 9 and shot.coordinate.y >= 0 and shot.coordinate.y <= 9
+
+    def find_boat(self) -> Coordinate: 
+        for i in range(9):
+            for j in range(9):
+                if self.grid[i][j] == "*":
+                    return Coordinate(j, i)
+
+        return Coordinate(0, 0)

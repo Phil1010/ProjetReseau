@@ -39,3 +39,6 @@ class Bot(Player):
 
     def timeout(self):
         pass
+
+    def set_exit(self) -> None:
+        pass
