@@ -13,7 +13,9 @@ class Timer(Thread):
 
     def run(self):
         print("début timer ")
-        while not self.stop.is_set() and self.duration != 0:
+        while self.duration != 0:
+            if self.stop.is_set():
+                break
             print('temps restant : ' + str(self.duration))
             time.sleep(1)
             self.duration -= 1

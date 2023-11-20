@@ -47,7 +47,7 @@ class Game(ABC, Thread):
 
 
     def nextTurn(self):
-        self.stop_timer.clear()
+        self.stop_timer = threading.Event()
         if self.turn % 2 == 0:
             t = Timer(self.playerA, 10, self.stop_timer)
             t.start()
