@@ -1,12 +1,12 @@
-import pickle
 from socket import socket, AF_INET, SOCK_STREAM
 from threading import Thread
-import threading
 from typing import List
 from games.MultiplayerGame import MultiplayerGame
 from games.SoloGame import SoloGame
-from message import Message
+from player.BotMoyen import BotMoyen
+from player.Bot import Bot
 from player.Human import Human
+from player.Player import Player
 
 
 class HandleClient(Thread):
@@ -20,8 +20,8 @@ class HandleClient(Thread):
         game = MultiplayerGame(humanA, humanB)
         game.start()
 
-    def solo(self, human: Human):
-        game = SoloGame(human)
+    def solo(self, human: Human, bot: Player):
+        game = SoloGame(human, bot)
         game.start()
 
     def run(self):
@@ -31,7 +31,13 @@ class HandleClient(Thread):
         gamemode = self.human.get_gamemode()
         
         if gamemode == "s":
-            self.solo(self.human)
+            difficulty = self.human.get_difficulty()
+            if difficulty == "f":
+                self.solo(self.human, Bot())
+            elif difficulty == "m":
+                self.solo(self.human, BotMoyen())
+
+
         elif gamemode == "m":
             room = self.human.get_room()
             if room == "c":

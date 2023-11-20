@@ -44,6 +44,9 @@ class Client(Thread):
                 elif message.action == "join room": # rejoindre une room
                     self.socket.send(pickle.dumps(Message("join room", input("Entrez le nom de la room à rejoindre : "))))
 
+                elif message.action == "get difficulty":
+                    self.socket.send(pickle.dumps(Message("set difficulty", input("Choisissez une difficulté : (f)acile, (m)oyen, (d)ifficile"))))
+
                 elif message.action == "get shot":
                     x = input("Choissisez une position x (entre 0 et 9 inclus) : ")
                     y = input("Choisissez une position y (entre 0 et 9 inclus) : ")

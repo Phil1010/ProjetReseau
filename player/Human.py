@@ -41,6 +41,15 @@ class Human(Player):
             shot = pickle.loads(message.content)
         return shot
 
+    def get_difficulty(self) -> str:
+        self.socket.send(pickle.dumps(Message("get difficulty", ""))+ "\r\n".encode())
+        message = pickle.loads(self.socket.recv(1024))
+        while not (message.content == "f" or message.content == "m" or message.content == "d"):
+            self.socket.send(pickle.dumps(Message("ERROR", "difficulté invalide")) + "\r\n".encode())
+            self.socket.send(pickle.dumps(Message("get difficulty", ""))+ "\r\n".encode())
+            message = pickle.loads(self.socket.recv(1024))
+        return message.content
+
     def get_ship(self, board: Board, size: int) -> Ship:
         self.socket.send(pickle.dumps(Message("get boat", size))+ "\r\n".encode())
         message = pickle.loads(self.socket.recv(1024))

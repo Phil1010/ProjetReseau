@@ -173,6 +173,10 @@ class Board:
         return True
 
     def is_shot_valid(self, shot: Shot) -> bool:
+        if (shot.coordinate.x, shot.coordinate.y) in self.missed_shots:
+            return False
+        if (shot.coordinate.x, shot.coordinate.y) in self.hit_shots:
+            return False
         return shot.coordinate.x >= 0 and shot.coordinate.x <= 9 and shot.coordinate.y >= 0 and shot.coordinate.y <= 9
 
     def find_boat(self) -> Coordinate: 
