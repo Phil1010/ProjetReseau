@@ -44,34 +44,40 @@ class Client(Thread):
                     self.socket.send(pickle.dumps(Message("join room", input("Entrez le nom de la room à rejoindre : "))))
 
                 elif message.action == "get shot":
+                    print(self.timeout, "test")
                     x = input("Choissisez une position x : ")
                     y = input("Choisissez une position y : ")
+                    # si x et y ne sont pas des entiers entre 0 et 9 on redemande
+                    while not x.isdigit() or not y.isdigit() or int(x) < 0 or int(x) > 9 or int(y) < 0 or int(y) > 9:
+                        print("Veuillez entrer des valeurs correctes")
+                        x = input("Choissisez une position x : ")
+                        y = input("Choisissez une position y : ")
+                        
 
-                    if self.timeout:
-                        print("Vous avez mis trop de temps a jouer !")
-                        x = random.randint(0, 9) 
-                        y = random.randint(0, 9)
-                        self.timeout = False
+                   
                     self.socket.send(pickle.dumps(Message("set shot", pickle.dumps(Shot(int(x), int(y))))))
 
                 elif message.action == "get boat":
                     size = int(message.content)
-                    x = input("Choisissez une position x pour le bateau de taille " + str(size))
-                    y = input("Choisissez une position y pour le bateau de taille " + str(size))
-                    orientation = input("Choisissez une orientation " + str(size))
-                    self.socket.send(pickle.dumps(Message("set boat", pickle.dumps(Ship(int(x), int(y), size, orientation))))) 
+                    x = input("Choisissez une position x pour le bateau de taille " + str(size) + " : ")
+                    y = input("Choisissez une position y pour le bateau de taille " + str(size) + " : ")
+                    orientation = input("Choisissez une orientation " + str(size) + " : ")
+                    #  si x et y ne sont pas des entiers entre 0 et 9 on redemande
+                    
+                    self.socket.send(pickle.dumps(Message("set boat", pickle.dumps(Ship(x, y, size, orientation))))) 
 
                 elif message.action == "set grid":
-                    print(message.content)
+                   print(message.content.replace("* ", "🚢").replace("X ", "💥").replace("0", "0️⃣").replace("1", "1️⃣").replace("2", "2️⃣").replace("3", "3️⃣").replace("4", "4️⃣").replace("5", "5️⃣").replace("6", "6️⃣").replace("7", "7️⃣").replace("8", "8️⃣").replace("9", "9️⃣").replace("~ ", "💧").replace("! ", "🧱"))
 
                 elif message.action == "set chronometer":
                     print(f"La partie a duré : {message.content}")
 
                 elif message.action == "set timeout":
                     self.timeout = True
+                    print("Vous avez mis trop de temps a jouer !")
 
                 else:
                     print("ERREUR", message.action, message.content)
                     
-Client("127.0.0.1", 12345).start()
+Client("192.168.246.126", 12345).start()
 

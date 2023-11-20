@@ -31,7 +31,7 @@ class Bot(Player):
     def get_gamemode(self) -> None:
         pass
 
-    def set_grid(self, playerBoard, ennemyBoard: Board) -> None:
+    def set_grid(self, playerBoard, ennemyBoard: Board, playerA, playerB) -> None:
         pass
 
     def notify(self, duree: int):

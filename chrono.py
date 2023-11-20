@@ -5,17 +5,21 @@ from player.Player import Player
 
 
 class Timer(Thread):
-    def __init__(self, player: Player, duration: int):
+    def __init__(self, player: Player, duration: int, stop: Event):
         super().__init__()
         self.duration = duration
         self.player = player
+        self.stop = stop
 
     def run(self):
-        while self.duration != 0:
+        print("début timer ")
+        while not self.stop.is_set() and self.duration != 0:
+            print('temps restant : ' + str(self.duration))
             time.sleep(1)
             self.duration -= 1
-
-        self.player.timeout() 
+            
+        if not self.stop.is_set():
+            self.player.timeout() 
 
 class Chronometre(Thread):
     def __init__(self, playerA, playerB: Player, stop: Event):

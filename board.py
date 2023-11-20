@@ -21,7 +21,7 @@ class Board:
 \n"""
 
         res += "# - - - - - - - - - - #" + 10 * " " + "# - - - - - - - - - - #\n"
-        res += "#    votre plateau    #" + 10 * " " + "#    plateau ennemi   #\n"
+        res += "     votre plateau     " + 10 * " " + "          plateau ennemi    \n"
         res += "# - - - - - - - - - - #" + 10 * " " + "# - - - - - - - - - - #\n\n"
 
         res += "# 0 1 2 3 4 5 6 7 8 9 #" + 10 * " " + "# 0 1 2 3 4 5 6 7 8 9 #\n"
@@ -30,31 +30,38 @@ class Board:
     def drawLineWithoutShip(self, n: int) -> str:
         if n == 0:
             self.drawHeader()
-        return f"{n} ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ |"
+        return f"{n} ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ! "
 
     def drawLineWithShips(self, n: int) -> str:
         if n == 0:
             self.drawHeader()
-        return f'{n} {" ".join(self.grid[n]).replace("X", "~")} |'
+        return f'{n} {" ".join(self.grid[n]).replace("X", "~")} ! '
 
     def drawLineWithShots(self, n: int) -> str:
         if n == 0:
             self.drawHeader()
-        return f'{n} {" ".join(self.grid[n]).replace("*", "~")} |'
+        return f'{n} {" ".join(self.grid[n]).replace("*", "~")} ! '
 
     def drawLineWithShipsAndShots(self, n: int) -> str:
         if n == 0:
             self.drawHeader()
-        return f'{n} {" ".join(self.grid[n])} |'
+        return f'{n} {" ".join(self.grid[n])} ! '
 
     def drawFullBoard(self):
         res = "# 0 1 2 3 4 5 6 7 8 9 #\n"
         for i in range(10):
             res += self.drawLineWithShipsAndShots(i) + "\n"
-        res += "# - - - - - - - - - - #\n"
+        res += "# ! ! ! ! ! ! ! ! ! ! #\n"
         return res
     
     def is_ship_position_valid(self, ship: ship.Ship):
+        # try except si c'est un string alors on renvoie false
+        try:
+            ship.x = int(ship.x)
+            ship.y = int(ship.y)
+        except:
+            return False
+        
         if not (ship.orientation == "v" or ship.orientation == "h"):
             return False
 

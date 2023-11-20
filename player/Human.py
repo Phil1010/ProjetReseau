@@ -41,7 +41,6 @@ class Human(Player):
             self.socket.send(pickle.dumps(Message("get boat", size))+ "\r\n".encode())
             message = pickle.loads(self.socket.recv(1024))
             ship = pickle.loads(message.content)
-
         return ship
 
     def get_room(self) -> str:
@@ -94,7 +93,7 @@ class Human(Player):
 
         
 
-    def set_grid(self, playerBoard, ennemyBoard: Board) -> None:
+    def set_grid(self, playerBoard, ennemyBoard: Board, playerA, playerB) -> None:
         res = playerBoard.drawHeader()
         for i in range(10):
             res += playerBoard.drawLineWithShipsAndShots(i)
@@ -102,8 +101,11 @@ class Human(Player):
             res += ennemyBoard.drawLineWithShots(i)
             res += "\n"
 
-        res += "# - - - - - - - - - - #" + 10 * " " + "# - - - - - - - - - - #\n"
+        res += "# ! ! ! ! ! ! ! ! ! ! #" + 10 * " " + "# ! ! ! ! ! ! ! ! ! ! #\n"
 
+        res = res.replace("votre plateau",playerA.name)
+        res = res.replace("plateau ennemi",playerB.name)
+                
         self.socket.send(pickle.dumps(Message("set grid", res))+ "\r\n".encode())
 
     def notify(self, duree: int):

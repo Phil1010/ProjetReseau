@@ -37,7 +37,7 @@ class Player(ABC):
         pass
 
     @abstractmethod
-    def set_grid(self, playerBoard, ennemyBoard: Board) -> None:
+    def set_grid(self, playerBoard, ennemyBoard: Board, playerA, playerB) -> None:
         pass
 
     @abstractmethod

@@ -10,11 +10,11 @@ from player.Human import Human
 
 
 class HandleClient(Thread):
-    def __init__(self, human: Human, playerList: List, room_list):
+    def __init__(self, client_socket: socket, playerList: List, room_list):
         super().__init__()
-        self.human = human
         self.playerList = playerList
         self.room_list = room_list
+        self.client_socket = client_socket
 
     def pvp(self, humanA, humanB: Human):
         game = MultiplayerGame(humanA, humanB)
@@ -25,6 +25,10 @@ class HandleClient(Thread):
         game.start()
 
     def run(self):
+        self.human = Human(self.client_socket)
+        self.playerList.append(self.human)
+
+
         gamemode = self.human.get_gamemode()
         
         if gamemode == "s":
@@ -56,9 +60,7 @@ class Server():
         self.socket.listen(2)
         while True:
             client_socket, client_address = self.socket.accept()
-            human = Human(client_socket)
-            self.clientList.append(human)
-            handler = HandleClient(human, self.clientList, self.room_list)
+            handler = HandleClient(client_socket, self.clientList, self.room_list)
             handler.start()
 
         client_socket.close()
@@ -66,5 +68,5 @@ class Server():
 
 
 
-s = Server("127.0.0.1", 12345)
+s = Server("192.168.246.126", 12345)
 s.run()
