@@ -3,7 +3,7 @@ from board import Board
 from player.Player import Player
 from ship import Ship
 from shot import Shot
-from message import Message
+
 
 class BotMoyen(Player):
     def __init__(self):
@@ -14,7 +14,7 @@ class BotMoyen(Player):
     def get_username(self) -> str:
         return "bot moyen"
 
-    def get_shot(self, board: Board, message: Message) -> Shot:
+    def get_shot(self, board: Board) -> Shot:
         shot = Shot(0, 0)
         if self.last_shot_ok:
             coo = self.last_shot.coordinate
@@ -99,17 +99,3 @@ class BotMoyen(Player):
 
     def set_exit(self) -> None:
         pass
-
-    def set_time(self, duration: int) -> None:
-        pass
-
-
-    def sendMessage(self, message: str) -> None:
-        pass
-
-
-    def get_action(self) -> Message:
-        return Message("set action", "/jouer")
-
-    def get_message(self) -> str:
-        return ""

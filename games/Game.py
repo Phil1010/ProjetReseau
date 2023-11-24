@@ -14,7 +14,8 @@ import time
 class Game(ABC, Thread):
     def __init__(self, playerA: Player, playerB: Player):
         super().__init__()
-
+        
+        self.spectators = []
         self.playerA = playerA
         self.playerB = playerB
         self.boardPlayerA = Board(playerA.name)
@@ -47,30 +48,49 @@ class Game(ABC, Thread):
 
 
     def nextTurn(self):
-        self.stop_timer.clear()
+        print("CA COMMENCE")
+        self.stop_timer = threading.Event()
         if self.turn % 2 == 0:
-            t = Timer(self.playerA, 10, self.stop_timer)
+            t = Timer(self.playerA, 10, self.stop_timer, self.spectators)
             t.start()
-            print('timer start')
-            shot = self.playerA.get_shot(self.boardPlayerB)
+            
+            message = self.playerA.get_action()
+
+            while message.action == "send message":
+                message = self.playerA.get_message(message)
+                self.broadcastMessage(self.playerA.name + " :: " + message)
+                message = self.playerA.get_action()
+
+            print("ACTION JOUER RECUE")
+            shot = self.playerA.get_shot(self.boardPlayerB, message)
             self.stop_timer.set()
             if not t.is_alive():
                 shot.coordinate.x = random.randint(0, 9)
                 shot.coordinate.y = random.randint(0, 9)
+            print("bloqué")
             self.boardPlayerB.shot(shot)
             self.playerB.set_grid(self.boardPlayerB, self.boardPlayerA, self.playerB, self.playerA)
             self.playerA.set_grid(self.boardPlayerA, self.boardPlayerB, self.playerA, self.playerB)
 
         else:
-            t = Timer(self.playerB, 10, self.stop_timer)
+
+            message = self.playerB.get_action()
+            print("BOT")
+            t = Timer(self.playerB, 10, self.stop_timer, self.spectators)
             t.start()
-            shot = self.playerB.get_shot(self.boardPlayerA)
-           
+            print('timer start')
+            shot = self.playerB.get_shot(self.boardPlayerA, message)
+            self.stop_timer.set()
+            if not t.is_alive():
+                shot.coordinate.x = random.randint(0, 9)
+                shot.coordinate.y = random.randint(0, 9)
                 
             self.boardPlayerA.shot(shot)
-                
             self.playerB.set_grid(self.boardPlayerB, self.boardPlayerA, self.playerB, self.playerA)
             self.playerA.set_grid(self.boardPlayerA, self.boardPlayerB, self.playerA, self.playerB)
+        
+        for spectator in self.spectators:
+            spectator.set_grid(self.boardPlayerA, self.boardPlayerB, self.playerA, self.playerB)
 
         self.turn += 1
 
@@ -96,3 +116,9 @@ class Game(ABC, Thread):
     def run(self):
         while not self.isFinished():
             self.nextTurn()
+
+    def broadcastMessage(self, message: str) -> None:
+        self.playerA.sendMessage(message)
+        self.playerB.sendMessage(message)
+        for spectator in self.spectators:
+            spectator.sendMessage(message)

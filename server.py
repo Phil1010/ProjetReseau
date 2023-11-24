@@ -7,25 +7,27 @@ from player.BotMoyen import BotMoyen
 from player.Bot import Bot
 from player.Human import Human
 from player.Player import Player
-
+from player.Spectator import Spectator
+from games.Game import Game
 
 class HandleClient(Thread):
-    def __init__(self, client_socket: socket, playerList: List, room_list):
+    def __init__(self, client_socket: socket, playerList: List, room_list, game_list):
         super().__init__()
         self.playerList = playerList
         self.room_list = room_list
         self.client_socket = client_socket
+        self.game_list = game_list
 
-    def pvp(self, humanA, humanB: Human):
-        game = MultiplayerGame(humanA, humanB)
-        game.start()
+    def pvp(self, humanA, humanB: Human) -> Game:
+        return MultiplayerGame(humanA, humanB)
 
-    def solo(self, human: Human, bot: Player):
-        game = SoloGame(human, bot)
-        game.start()
+    def solo(self, human: Human, bot: Player) -> Game:
+        return SoloGame(human, bot)
 
     def run(self):
+        print("a")
         self.human = Human(self.client_socket)
+        self.human.name = self.human.get_username()
         self.playerList.append(self.human)
 
         gamemode = self.human.get_gamemode()
@@ -33,9 +35,9 @@ class HandleClient(Thread):
         if gamemode == "s":
             difficulty = self.human.get_difficulty()
             if difficulty == "f":
-                self.solo(self.human, Bot())
+                self.solo(self.human, Bot()).start()
             elif difficulty == "m":
-                self.solo(self.human, BotMoyen())
+                self.solo(self.human, BotMoyen()).start()
 
 
         elif gamemode == "m":
@@ -46,12 +48,21 @@ class HandleClient(Thread):
 
             elif room == "r":
                 room_name = self.human.join_room(self.room_list)
-                self.room_list[room_name].append(self.human)
+                if len(self.room_list[room_name]) < 2:
+                    print("AJOUT JOUEUR B")
+                    self.room_list[room_name].append(self.human)
+                    print(self.game_list)
 
-                if len(self.room_list[room_name]) == 2:
-                    self.pvp(self.room_list[room_name][0], self.room_list[room_name][1])
-                    self.room_list.pop(room_name, None)
+                    self.game_list[room_name] = self.pvp(self.room_list[room_name][0], self.room_list[room_name][1])
+                    print(self.game_list)
+                    self.game_list[room_name].start()
+                    print(self.game_list)
+                    print("AAAAAAAAAAA")
 
+                elif len(self.room_list[room_name]) >= 2:
+                    print("SPECTATEUR")
+                    spectator = Spectator(self.client_socket)
+                    self.game_list[room_name].spectators.append(spectator)
             
 
 class Server():
@@ -60,17 +71,17 @@ class Server():
         self.socket.bind((host, port))
         self.clientList = []
         self.room_list = {}
+        self.game_list = {}
 
     def run(self):
         self.socket.listen(2)
         while True:
             client_socket, client_address = self.socket.accept()
-            handler = HandleClient(client_socket, self.clientList, self.room_list)
+            handler = HandleClient(client_socket, self.clientList, self.room_list, self.game_list)
             handler.start()
 
         client_socket.close()
         server_socket.close()
-
 
 
 s = Server("127.0.0.1", 12345)

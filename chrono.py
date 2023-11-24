@@ -5,11 +5,12 @@ from player.Player import Player
 
 
 class Timer(Thread):
-    def __init__(self, player: Player, duration: int, stop: Event):
+    def __init__(self, player: Player, duration: int, stop: Event, spectators):
         super().__init__()
         self.duration = duration
         self.player = player
         self.stop = stop
+        self.spectators = spectators
 
     def run(self):
         print("début timer ")
@@ -17,6 +18,9 @@ class Timer(Thread):
             print('temps restant : ' + str(self.duration))
             time.sleep(1)
             self.duration -= 1
+            self.player.set_time(self.duration)
+            for spectator in self.spectators:
+                spectator.set_time(self.duration)
             
         if not self.stop.is_set():
             self.player.timeout() 

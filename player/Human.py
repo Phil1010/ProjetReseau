@@ -1,5 +1,4 @@
 import pickle
-from typing import Dict
 from board import Board
 from message import Message
 from player.Player import Player
@@ -13,7 +12,6 @@ class Human(Player):
     def __init__(self, socket: socket):
         super().__init__("human")
         self.socket = socket
-        self.name = self.get_username()
 
     def get_username(self) -> str:
         self.socket.send(pickle.dumps(Message("get username", "")) + "\r\n".encode())
@@ -24,10 +22,19 @@ class Human(Player):
             message = pickle.loads(self.socket.recv(1024))
         return message.content
 
-    def get_shot(self, board: Board) -> Shot:
-        self.socket.send(pickle.dumps(Message("get shot", ""))+ "\r\n".encode())
+    def get_action(self) -> Message:
+        self.socket.send(pickle.dumps(Message("get action", ""))+ "\r\n".encode())
         message = pickle.loads(self.socket.recv(1024))
 
+        if message.action != "set shot":
+            self.socket.send(pickle.dumps(Message("get action", ""))+ "\r\n".encode())
+
+        return message        
+
+    def get_shot(self, board: Board, message: Message) -> Shot:
+        # self.socket.send(pickle.dumps(Message("get shot", ""))+ "\r\n".encode())
+        # message = pickle.loads(self.socket.recv(1024))
+        
         if message.content == "ameno":
             print("AMENO")
             coo = board.find_boat()
@@ -35,11 +42,15 @@ class Human(Player):
 
         shot = pickle.loads(message.content)
         while not board.is_shot_valid(shot):
+            print("ererur")
             self.socket.send(pickle.dumps(Message("ERROR", "tir invalide")) + "\r\n".encode())
-            self.socket.send(pickle.dumps(Message("get shot", ""))+ "\r\n".encode())
+            self.socket.send(pickle.dumps(Message("get action", ""))+ "\r\n".encode())
             message = pickle.loads(self.socket.recv(1024))
             shot = pickle.loads(message.content)
         return shot
+
+    def get_message(self, message: Message) -> str:
+        return message.content
 
     def get_difficulty(self) -> str:
         self.socket.send(pickle.dumps(Message("get difficulty", ""))+ "\r\n".encode())
@@ -137,4 +148,10 @@ class Human(Player):
 
     def timeout(self):
         self.socket.send(pickle.dumps(Message("set timeout", "")))
+
+    def set_time(self, duration: int) -> None:
+        self.socket.send(pickle.dumps(Message("set time", str(duration))))
+
+    def sendMessage(self, message: str):
+        self.socket.send(pickle.dumps(Message("send message", message)))
     

@@ -3,7 +3,7 @@ from board import Board
 from player.Player import Player
 from ship import Ship
 from shot import Shot
-
+from message import Message
 
 class Bot(Player):
     def __init__(self):
@@ -12,7 +12,7 @@ class Bot(Player):
     def get_username(self) -> str:
         return "bot"
 
-    def get_shot(self, board: Board) -> Shot:
+    def get_shot(self, board: Board, message: Message) -> Shot:
         return Shot(random.randint(0, 9), random.randint(0, 9))
 
     def get_ship(self, board: Board, size: int) -> Ship:
@@ -42,3 +42,16 @@ class Bot(Player):
 
     def set_exit(self) -> None:
         pass
+
+    def set_time(self, duration: int) -> None:
+        pass
+
+    def sendMessage(self, message: str) -> None:
+        pass
+
+    
+    def get_action(self) -> Message:
+        return Message("set action", "/jouer")
+
+    def get_message(self) -> str:
+        return ""
