@@ -109,7 +109,7 @@ class BotMoyen(Player):
 
 
     def get_action(self) -> Message:
-        return Message("set action", "/jouer")
+        return Message("set shot", "/jouer")
 
     def get_message(self) -> str:
         return ""
