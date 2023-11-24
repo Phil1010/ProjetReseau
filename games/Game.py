@@ -51,7 +51,7 @@ class Game(ABC, Thread):
         print("CA COMMENCE")
         self.stop_timer = threading.Event()
         if self.turn % 2 == 0:
-            t = Timer(self.playerA, 10, self.stop_timer, self.spectators)
+            t = Timer(self.playerA, 60, self.stop_timer, self.spectators)
             t.start()
             
             message = self.playerA.get_action()
@@ -61,33 +61,38 @@ class Game(ABC, Thread):
                 self.broadcastMessage(self.playerA.name + " :: " + message)
                 message = self.playerA.get_action()
 
-            print("ACTION JOUER RECUE")
-            shot = self.playerA.get_shot(self.boardPlayerB, message)
-            self.stop_timer.set()
-            if not t.is_alive():
-                shot.coordinate.x = random.randint(0, 9)
-                shot.coordinate.y = random.randint(0, 9)
-            print("bloqué")
-            self.boardPlayerB.shot(shot)
-            self.playerB.set_grid(self.boardPlayerB, self.boardPlayerA, self.playerB, self.playerA)
-            self.playerA.set_grid(self.boardPlayerA, self.boardPlayerB, self.playerA, self.playerB)
+            if message.action == "set shot":
+                shot = self.playerA.get_shot(self.boardPlayerB, message)
+                self.stop_timer.set()
+                if not t.is_alive():
+                    shot.coordinate.x = random.randint(0, 9)
+                    shot.coordinate.y = random.randint(0, 9)
+
+                self.boardPlayerB.shot(shot)
+                self.playerB.set_grid(self.boardPlayerB, self.boardPlayerA, self.playerB, self.playerA)
+                self.playerA.set_grid(self.boardPlayerA, self.boardPlayerB, self.playerA, self.playerB)
 
         else:
-
-            message = self.playerB.get_action()
-            print("BOT")
-            t = Timer(self.playerB, 10, self.stop_timer, self.spectators)
+            t = Timer(self.playerB, 60, self.stop_timer, self.spectators)
             t.start()
-            print('timer start')
-            shot = self.playerB.get_shot(self.boardPlayerA, message)
-            self.stop_timer.set()
-            if not t.is_alive():
-                shot.coordinate.x = random.randint(0, 9)
-                shot.coordinate.y = random.randint(0, 9)
-                
-            self.boardPlayerA.shot(shot)
-            self.playerB.set_grid(self.boardPlayerB, self.boardPlayerA, self.playerB, self.playerA)
-            self.playerA.set_grid(self.boardPlayerA, self.boardPlayerB, self.playerA, self.playerB)
+            
+            message = self.playerB.get_action()
+
+            while message.action == "send message":
+                message = self.playerB.get_message(message)
+                self.broadcastMessage(self.playerB.name + " :: " + message)
+                message = self.playerB.get_action()
+
+            if message.action == "set shot":
+                shot = self.playerB.get_shot(self.boardPlayerA, message)
+                self.stop_timer.set()
+                if not t.is_alive():
+                    shot.coordinate.x = random.randint(0, 9)
+                    shot.coordinate.y = random.randint(0, 9)
+
+                self.boardPlayerA.shot(shot)
+                self.playerA.set_grid(self.boardPlayerA, self.boardPlayerB, self.playerA, self.playerB)
+                self.playerB.set_grid(self.boardPlayerB, self.boardPlayerA, self.playerB, self.playerA)
         
         for spectator in self.spectators:
             spectator.set_grid(self.boardPlayerA, self.boardPlayerB, self.playerA, self.playerB)

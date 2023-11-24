@@ -15,12 +15,12 @@ class Timer(Thread):
     def run(self):
         print("début timer ")
         while not self.stop.is_set() and self.duration != 0:
-            print('temps restant : ' + str(self.duration))
             time.sleep(1)
             self.duration -= 1
-            self.player.set_time(self.duration)
-            for spectator in self.spectators:
-                spectator.set_time(self.duration)
+            if self.duration % 10 == 0 or self.duration <= 5:
+                self.player.set_time(self.duration)
+                for spectator in self.spectators:
+                    spectator.set_time(self.duration)
             
         if not self.stop.is_set():
             self.player.timeout() 

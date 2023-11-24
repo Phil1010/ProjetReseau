@@ -16,7 +16,6 @@ class Shoot(Thread):
         while not (commande == "/message" or commande == "/jouer"):
             commande = input("/message pour envoyer un message à l'autre joueur, /jouer pour tirer")
 
-
         if commande == "/jouer":
             x = input("Choissisez une position x (entre 0 et 9 inclus) : ")
             y = input("Choisissez une position y (entre 0 et 9 inclus) : ")
@@ -88,7 +87,7 @@ class Client(Thread):
                     Shoot(self.socket).start()
 
                 elif message.action == "set time":
-                    # print(message.content)
+                    print(message.content)
                     self.time = message.content
                     # self.update_ui()
 
