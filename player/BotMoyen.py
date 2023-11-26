@@ -5,6 +5,7 @@ from ship import Ship
 from shot import Shot
 from message import Message
 
+
 class BotMoyen(Player):
     def __init__(self):
         super().__init__("bot moyen")
@@ -18,8 +19,8 @@ class BotMoyen(Player):
         shot = Shot(0, 0)
         if self.last_shot_ok:
             coo = self.last_shot.coordinate
-            randomx = random.choice([-1, 0, 1])  
-            coo.x += randomx           
+            randomx = random.choice([-1, 0, 1])
+            coo.x += randomx
 
             if randomx == 0:
                 coo.y += random.choice([-1, 1])
@@ -29,12 +30,10 @@ class BotMoyen(Player):
             shot.coordinate.x = coo.x
             shot.coordinate.y = coo.y
 
-
-
             while not board.is_shot_valid(shot):
                 coo = self.last_shot.coordinate
-                randomx = random.choice([-1, 0, 1])  
-                coo.x += randomx           
+                randomx = random.choice([-1, 0, 1])
+                coo.x += randomx
 
                 if randomx == 0:
                     coo.y += random.choice([-1, 1])
@@ -43,28 +42,25 @@ class BotMoyen(Player):
 
                 shot.coordinate.x = coo.x
                 shot.coordinate.y = coo.y
-            
+
             if board.grid[coo.y][coo.x] == "*":
                 self.last_shot_ok = True
-                print("touché :", coo.x, coo.y)
             else:
                 self.last_shot_ok = False
 
             self.last_shot = shot
-            
+
             return self.last_shot
 
         else:
             shot.coordinate.x = random.randint(0, 5)
             shot.coordinate.y = random.randint(0, 5)
-            print("pas touché :", shot.coordinate.x, shot.coordinate.y)
             while not board.is_shot_valid(shot):
                 shot.coordinate.x = random.randint(0, 5)
                 shot.coordinate.y = random.randint(0, 5)
 
             if board.grid[shot.coordinate.y][shot.coordinate.x] == "*":
                 self.last_shot_ok = True
-                print("touché :", shot.coordinate.x, shot.coordinate.y)
 
             else:
                 self.last_shot_ok = False
@@ -73,9 +69,19 @@ class BotMoyen(Player):
             return shot
 
     def get_ship(self, board: Board, size: int) -> Ship:
-        ship = Ship(random.randint(0, 9 - size), random.randint(0, 9 - size), size, random.choice(["v", "h"]))
+        ship = Ship(
+            random.randint(0, 9 - size),
+            random.randint(0, 9 - size),
+            size,
+            random.choice(["v", "h"]),
+        )
         while not board.is_ship_position_valid(ship):
-            ship = Ship(random.randint(0, 9 - size), random.randint(0, 9 - size), size, random.choice(["v", "h"]))
+            ship = Ship(
+                random.randint(0, 9 - size),
+                random.randint(0, 9 - size),
+                size,
+                random.choice(["v", "h"]),
+            )
 
         return ship
 
@@ -103,10 +109,8 @@ class BotMoyen(Player):
     def set_time(self, duration: int) -> None:
         pass
 
-
     def sendMessage(self, message: str) -> None:
         pass
-
 
     def get_action(self) -> Message:
         return Message("set shot", "/jouer")

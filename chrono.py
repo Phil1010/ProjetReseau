@@ -1,4 +1,4 @@
-from threading import Thread,Event
+from threading import Thread, Event
 import time
 from player.Human import Human
 from player.Player import Player
@@ -13,7 +13,6 @@ class Timer(Thread):
         self.spectators = spectators
 
     def run(self):
-        print("début timer ")
         while not self.stop.is_set() and self.duration != 0:
             time.sleep(1)
             self.duration -= 1
@@ -21,9 +20,10 @@ class Timer(Thread):
                 self.player.set_time(self.duration)
                 for spectator in self.spectators:
                     spectator.set_time(self.duration)
-            
+
         if not self.stop.is_set():
-            self.player.timeout() 
+            self.player.timeout()
+
 
 class Chronometre(Thread):
     def __init__(self, playerA, playerB: Player, stop: Event):
@@ -37,6 +37,6 @@ class Chronometre(Thread):
         while not self.stop.is_set():
             time.sleep(1)
             self.timer += 1
-            
+
         self.playerA.notify(self.timer)
         self.playerB.notify(self.timer)

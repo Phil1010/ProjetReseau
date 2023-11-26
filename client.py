@@ -59,7 +59,6 @@ class Client(Thread):
                     break
 
                 message = pickle.loads(messageBytes)
-                print("DEBUG", message.action)
 
                 if message.action == "get username":
                     self.socket.send(pickle.dumps(Message("set username", input("Choisissez un nom d'utilisateur : "))) + "\r\n".encode())
@@ -121,7 +120,6 @@ class Client(Thread):
                     print(message.content)
 
                 else:
-                    print("ERREURRRRRRRR")
                     print(message.action, message.content)
 
     # def update_ui(self):

@@ -113,8 +113,6 @@ class Board:
             self.missed_shots.append((x, y))
             self.grid[y][x] = "-"
 
-        print(x, y)
-        print(self.drawFullBoard())
         return self.grid
 
     def is_win(self) -> bool:

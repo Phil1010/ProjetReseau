@@ -48,7 +48,6 @@ class Game(ABC, Thread):
 
 
     def nextTurn(self):
-        print("CA COMMENCE")
         self.stop_timer = threading.Event()
         if self.turn % 2 == 0:
             t = Timer(self.playerA, 60, self.stop_timer, self.spectators)
